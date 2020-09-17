@@ -1,0 +1,15 @@
+name: subsampler
+channels:
+- bioconda
+- conda-forge
+- defaults
+dependencies:
+- python=3.6*
+- snakemake-minimal=5.10.0
+- pandas
+- biopython
+- numpy
+- matplotlib
+- pip
+- pip:
+  - epiweeks

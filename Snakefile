@@ -7,7 +7,7 @@ rule arguments:
 		exclude = "config/remove.txt",
 		index_column = "iso",
 		date_column = "date",
-		baseline = "0.0001",
+		baseline = "0.002",
 		refgenome_size = "29420",
 		max_missing = "5",
 		seed_num = "2007",
@@ -78,7 +78,7 @@ rule correct_bias:
 	output:
 		output1 = "outputs/weekly_sampling_proportions.tsv",
 		output2 = "outputs/weekly_sampling_bias.tsv",
-		output3 = "outputs/matrix_cases_epiweeks_corrected.tsv"
+		output3 = "outputs/matrix_genomes_epiweeks_corrected.tsv"
 	shell:
 		"""
 		python3 scripts/correct_bias.py \

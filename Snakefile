@@ -100,7 +100,7 @@ rule subsample:
 	input:
 		sequences = arguments.sequences,
 		metadata = arguments.metadata,
-		corrected_matrix = "outputs/matrix_cases_epiweeks_corrected.tsv",
+		corrected_matrix = "outputs/matrix_genomes_epiweeks_corrected.tsv",
 		keep = arguments.include,
 		remove = arguments.exclude
 	params:

@@ -92,7 +92,7 @@ rule correct_bias:
 		"""
 
 
-rule subsampler:
+rule subsample:
 	message:
 		"""
 		Sample genomes and metadata according to the corrected genome matrix

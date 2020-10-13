@@ -13,3 +13,5 @@ dependencies:
 - pip
 - pip:
   - epiweeks
+  - pycountry-convert
+  - pycountry

@@ -4,8 +4,6 @@ from epiweeks import Week
 import random
 import time
 import argparse
-import pycountry_convert as pyCountry
-import pycountry
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -19,7 +17,6 @@ if __name__ == '__main__':
     parser.add_argument("--refgenome-size", required=True, type=int,  help="Reference genome size")
     parser.add_argument("--keep", required=False, help="List of samples to keep, in all instances")
     parser.add_argument("--remove", required=False, help="List of samples to remove, in all instances")
-    parser.add_argument("--drop", required=False, help="TSV file listing columns/values of samples to be dropped")
     parser.add_argument("--seed", required=False, type=int,  help="Seed number for pseudorandom sampling of genomes")
     parser.add_argument("--index-column", required=True, help="Metadata column with unique geographic information")
     parser.add_argument("--date-column", required=True, type=str,  help="Metadata column containing the collection dates")
@@ -39,7 +36,6 @@ if __name__ == '__main__':
     max_gaps = args.max_missing
     keep = args.keep
     remove = args.remove
-    drop_file = args.drop
     seed = args.seed
     geo_level = args.index_column
     date_col = args.date_column
@@ -51,10 +47,10 @@ if __name__ == '__main__':
     output3 = args.report
 
 
-    # path = '/Users/anderson/GLab Dropbox/Anderson Brito/projects/ncov_bubble/nextstrain/run12_20201008_batch15/sampling_prop/'
-    # input1 = path + 'data/gisaid_hcov-19.fasta'
-    # input2 = path + 'data/metadata_nextstrain.tsv'
-    # input3 = path + 'outputs/matrix_genomes_epiweeks_corrected.tsv'
+    # path = '/Users/anderson/GLab Dropbox/Anderson Brito/github/subsampler/'
+    # input1 = path + 'data/sequences_corrected.fasta'
+    # input2 = path + 'data/metadata.tsv'
+    # input3 = path + 'outputs/matrix_cases_epiweeks_corrected.tsv'
     # keep = path + 'config/keep.txt'
     # remove = path + 'config/remove.txt'
     # geo_level = 'iso'
@@ -65,7 +61,7 @@ if __name__ == '__main__':
     # genome_size = 29420
     # max_gaps = 5
     # start_date = '2019-12-15'
-    # end_date = '2020-09-30'
+    # end_date = '2020-08-29'
     # # start_date = None
     # # end_date = None
     # output1 = path + 'sequences_corrected0001.fasta'
@@ -103,7 +99,6 @@ if __name__ == '__main__':
     print('\n### Loading matrices...')
     # open metadata file
     dfM = pd.read_csv(input2, encoding='utf-8', sep=separator, dtype=str)
-    dfM.fillna('', inplace=True)
     # print(dfM)
 
     # open genome sampling matrix
@@ -150,9 +145,11 @@ if __name__ == '__main__':
     for strain in fasta_headers:
         if strain in meta_seqs:
             intersection.append(strain)
+            # print('+ ', strain)
         else:
+            # print('- ', strain)
             remove_sequences.append(strain)
-
+    # print(intersection)
 
     # list of sequences to be kept in all instances
     keep_sequences = []
@@ -168,15 +165,9 @@ if __name__ == '__main__':
     dfM = dfM[dfM['strain'].isin(intersection)]
     dfM = dfM[~dfM['strain'].isin(remove_sequences)] # remove bad quality sequences
 
+    # print(keep_sequences)
+    # print(remove_sequences)
 
-    # drop rows with unwanted samples
-    for line in open(drop_file).readlines():
-        column, value = line.strip().split('\t')
-        print('Batch removal: column=' + column + '; value=' + value)
-        dfM = dfM[~dfM[column].isin([value])] # batch drop specific samples
-
-
-    ### FIX OR ADD NEW COLUMNS IN THE METADATA
 
     # create epiweek column
     def get_epiweeks(date):
@@ -185,105 +176,14 @@ if __name__ == '__main__':
         epiweek = epiweek[:4] + '_' + 'EW' + epiweek[-2:]
         return epiweek
     dfM['epiweek'] = dfM[date_col].apply(lambda x: get_epiweeks(x))
+    # dfM.set_index('strain', inplace=True)
     # print(dfM)
-
-    # fix place of origin when disagreements between 'place' and 'place_exposure' exist
-    geo_columns = ['region', 'country', 'division']
-    for level in geo_columns:
-        exposure_column = level + '_exposure'
-        for idx, row in dfM.iterrows():
-            if dfM.loc[idx, exposure_column].lower() in ['', 'unknown']:
-                dfM.loc[idx, exposure_column] = dfM.loc[idx, level]
-
-    # get ISO alpha3 country codes
-    isos = {}
-    def get_iso(country):
-        global isos
-        if country not in isos.keys():
-            try:
-                isoCode = pyCountry.country_name_to_country_alpha3(country, cn_name_format="default")
-                isos[country] = isoCode
-            except:
-                try:
-                    isoCode = pycountry.countries.search_fuzzy(country)[0].alpha_3
-                    isos[country] = isoCode
-                except:
-                    isos[country] = ''
-        return isos[country]
-
-
-    # add country iso code
-    if 'iso' not in dfM.columns.to_list():
-        dfM.insert(1, 'iso', '')
-        dfM['iso'] = dfM['country_exposure'].apply(lambda x: get_iso(x))
-
-    # add state code
-    us_state_abbrev = {
-        'Alabama': 'AL',
-        'Alaska': 'AK',
-        'American Samoa': 'AS',
-        'Arizona': 'AZ',
-        'Arkansas': 'AR',
-        'California': 'CA',
-        'Colorado': 'CO',
-        'Connecticut': 'CT',
-        'Delaware': 'DE',
-        'District of Columbia': 'DC',
-        'Washington DC': 'DC',
-        'Florida': 'FL',
-        'Georgia': 'GA',
-        'Guam': 'GU',
-        'Hawaii': 'HI',
-        'Idaho': 'ID',
-        'Illinois': 'IL',
-        'Indiana': 'IN',
-        'Iowa': 'IA',
-        'Kansas': 'KS',
-        'Kentucky': 'KY',
-        'Louisiana': 'LA',
-        'Maine': 'ME',
-        'Maryland': 'MD',
-        'Massachusetts': 'MA',
-        'Michigan': 'MI',
-        'Minnesota': 'MN',
-        'Mississippi': 'MS',
-        'Missouri': 'MO',
-        'Montana': 'MT',
-        'Nebraska': 'NE',
-        'Nevada': 'NV',
-        'New Hampshire': 'NH',
-        'New Jersey': 'NJ',
-        'New Mexico': 'NM',
-        'New York': 'NY',
-        'North Carolina': 'NC',
-        'North Dakota': 'ND',
-        'Northern Mariana Islands': 'MP',
-        'Ohio': 'OH',
-        'Oklahoma': 'OK',
-        'Oregon': 'OR',
-        'Pennsylvania': 'PA',
-        'Puerto Rico': 'PR',
-        'Rhode Island': 'RI',
-        'South Carolina': 'SC',
-        'South Dakota': 'SD',
-        'Tennessee': 'TN',
-        'Texas': 'TX',
-        'Utah': 'UT',
-        'Vermont': 'VT',
-        'Virgin Islands': 'VI',
-        'Virginia': 'VA',
-        'Washington': 'WA',
-        'West Virginia': 'WV',
-        'Wisconsin': 'WI',
-        'Wyoming': 'WY'
-    }
-    if 'state_code' not in dfM.columns.to_list():
-        dfM.insert(1, 'state_code', '')
-        dfM['state_code'] = dfM['division_exposure'].apply(lambda x: us_state_abbrev[x] if x in us_state_abbrev else '')
-
 
     # empty matrix dataframe
     columns = sorted(dfM['epiweek'].unique().tolist())
+    # print(columns)
+    # for i in dfM[geo_level].unique().tolist():
+    #     print(i)
     rows = sorted(dfM[geo_level].astype(str).unique().tolist())
 
     dfG = pd.DataFrame(index=rows, columns=columns)
@@ -293,7 +193,7 @@ if __name__ == '__main__':
             dfG.at[row, column] = []
 
     # print(dfG)
-    # print(keep_sequences)
+    print(keep_sequences)
 
     # add pre-selected genomes to matrix
     for genome in keep_sequences:
@@ -321,19 +221,17 @@ if __name__ == '__main__':
                 try:
                     target_sampling = int(dfS.loc[dfS[geo_level] == name, epiweek])
                 except:
-                    target_sampling = 1 # available_samples # take this number of genomes when not epidata is available
+                    target_sampling = available_samples
                 # print('')
+                # bias = available_samples / target_sampling
                 # print(name, epiweek, '-', available_samples, target_sampling, bias)
 
-                existing = dfG.loc[name, epiweek] # pre-selected sequences
+                existing = dfG.loc[name, epiweek]
                 # print(existing)
 
                 if target_sampling >= available_samples:  # if requested sample number is higher than available genomes, get all
                     sampled = [sample for sample in dfEpiweek['strain'].to_list() if sample not in existing]
                     # print(sampled, len(sampled))
-                elif target_sampling == 1:
-                    pool = [sample for sample in dfEpiweek['strain'].to_list() if sample not in existing]
-                    sampled = random.sample(pool, 1)
                 else:
                     pool = [sample for sample in dfEpiweek['strain'].to_list() if sample not in existing]
                     sampled = random.sample(pool, target_sampling - len(existing))
@@ -387,7 +285,6 @@ if __name__ == '__main__':
 
     # export metadata
     dfM = dfM[dfM['strain'].isin(selected_samples)]
-    dfM = dfM.sort_values(by=geo_level)
     dfM.to_csv(output2, sep='\t', index=False)
 
 

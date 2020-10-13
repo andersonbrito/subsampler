@@ -53,6 +53,8 @@ rule epiweek_conversion:
 	output:
 		output1 = "outputs/matrix_genomes_epiweeks.tsv",
 		output2 = "outputs/matrix_cases_epiweeks.tsv"
+	params:
+		start_date = "2020-02-22"
 	shell:
 		"""
 		python3 scripts/convertDays2Epiweek.py \
@@ -60,6 +62,7 @@ rule epiweek_conversion:
 			--output {output.output1}
 		python3 scripts/convertDays2Epiweek.py \
 			--input {input.case_matrix} \
+			--start-date {params.start_date} \
 			--output {output.output2}
 		"""
 

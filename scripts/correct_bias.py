@@ -15,8 +15,8 @@ if __name__ == '__main__':
     parser.add_argument("--output2", required=True, help="TSV file showing genome sampling bias per epiweek")
     parser.add_argument("--output3", required=True, help="TSV file showing corrected genome counts per epiweek")
     args = parser.parse_args()
-    
-    
+
+
     input1 = args.genome_matrix
     input2 = args.case_matrix
     unique_id = args.index_column
@@ -26,14 +26,14 @@ if __name__ == '__main__':
     baseline = args.baseline
 
 
-#     path = '/Users/anderson/GLab Dropbox/Anderson Brito/projects/ncov_nfl/nextstrain/batch01_20201012e/sampling_prop_Global/outputs/'
-#     input1 = path + 'matrix_genomes_epiweeks.tsv'
-#     input2 = path + 'matrix_cases_epiweeks.tsv'
-#     output1 = path + 'weekly_sampling_proportions.tsv'
-#     output2 = path + 'weekly_sampling_bias.tsv'
-#     output3 = path + 'matrix_genomes_epiweeks_corrected.tsv'
-#     unique_id = 'iso'
-#     baseline = 0.01
+    # path = '/Users/anderson/GLab Dropbox/Anderson Brito/projects/ncov_nfl/nextstrain/batch01_20201012e/sampling_prop_Global/outputs/'
+    # input1 = path + 'matrix_genomes_epiweeks.tsv'
+    # input2 = path + 'matrix_cases_epiweeks.tsv'
+    # output1 = path + 'weekly_sampling_proportions.tsv'
+    # output2 = path + 'weekly_sampling_bias.tsv'
+    # output3 = path + 'matrix_genomes_epiweeks_corrected.tsv'
+    # unique_id = 'iso'
+    # baseline = 0.01
 
 
     # input genome and case counts per epiweek
@@ -108,7 +108,7 @@ if __name__ == '__main__':
                 samp_prop = int(genome_count)/int(case_count)
                 bias = float(samp_prop - global_samp_prop)
                 corrected_count = 0
-                if case_count * global_samp_prop > 0.25:
+                if case_count * global_samp_prop >= 0.5: # defines how to proceed when requested values is below 1 genome
                     corrected_count = int(np.ceil(case_count * global_samp_prop))
                 # print(genome_count, case_count, samp_prop)
                 # print(idx, bias)

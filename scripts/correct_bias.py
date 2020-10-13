@@ -15,8 +15,8 @@ if __name__ == '__main__':
     parser.add_argument("--output2", required=True, help="TSV file showing genome sampling bias per epiweek")
     parser.add_argument("--output3", required=True, help="TSV file showing corrected genome counts per epiweek")
     args = parser.parse_args()
-
-
+    
+    
     input1 = args.genome_matrix
     input2 = args.case_matrix
     unique_id = args.index_column
@@ -26,14 +26,14 @@ if __name__ == '__main__':
     baseline = args.baseline
 
 
-    # path = '/Users/anderson/GLab Dropbox/Anderson Brito/projects/ncov_samplingbias/subsampling/run4_mundo/'
-    # input1 = path + 'matrix_genomes_epiweeks.tsv'
-    # input2 = path + 'matrix_cases_epiweeks.tsv'
-    # output1 = path + 'weekly_sampling_proportions.tsv'
-    # output2 = path + 'weekly_sampling_bias.tsv'
-    # output3 = path + 'matrix_genomes_epiweeks_corrected.tsv'
-    # unique_id = 'iso'
-    # baseline = 0.01
+#     path = '/Users/anderson/GLab Dropbox/Anderson Brito/projects/ncov_nfl/nextstrain/batch01_20201012e/sampling_prop_Global/outputs/'
+#     input1 = path + 'matrix_genomes_epiweeks.tsv'
+#     input2 = path + 'matrix_cases_epiweeks.tsv'
+#     output1 = path + 'weekly_sampling_proportions.tsv'
+#     output2 = path + 'weekly_sampling_bias.tsv'
+#     output3 = path + 'matrix_genomes_epiweeks_corrected.tsv'
+#     unique_id = 'iso'
+#     baseline = 0.01
 
 
     # input genome and case counts per epiweek
@@ -94,7 +94,6 @@ if __name__ == '__main__':
                 case_count = int(dfC.loc[idx, epiweek])
             except:
                 case_count = 0
-                # print(idx)
                 if idx not in no_casedata:
                     no_casedata.append(idx)
 
@@ -107,9 +106,10 @@ if __name__ == '__main__':
                     case_count = genome_count
 
                 samp_prop = int(genome_count)/int(case_count)
-                # samp_prop = np.absolute(np.log(int(genome_count)/int(case_count)))
                 bias = float(samp_prop - global_samp_prop)
-                corrected_count = int(np.ceil(case_count * global_samp_prop))
+                corrected_count = 0
+                if case_count * global_samp_prop > 0.25:
+                    corrected_count = int(np.ceil(case_count * global_samp_prop))
                 # print(genome_count, case_count, samp_prop)
                 # print(idx, bias)
             elif int(case_count) > 0 and int(genome_count) == 0:
@@ -138,10 +138,6 @@ if __name__ == '__main__':
         else:
             dfP.loc[idx, 'cumulative_proportion'] = 'NA'
 
-    # print(dfP)
-    # print(dfB)
-    # print(dfW)
-
 
     # output processed dataframes
     dfP.to_csv(output1, sep='\t', index=True)
@@ -150,27 +146,5 @@ if __name__ == '__main__':
 
     # report
     if len(no_casedata) > 0:
-        print('\n### Not case data found for:\n')
+        print('\n### No case data found for:\n')
         [print(' - ' + loc) for loc in no_casedata]
-
-    # dfP = dfP.replace('X', np.NaN).replace(0, np.NaN)
-    # dfT = dfP[date_intersection].stack()
-    # mean_prop = dfT.values.mean()
-    # std_prop = dfT.values.std(ddof=0)
-    #
-    # print(mean_prop, std_prop)
-    #
-    # dfZ = dfG.filter(nonDateCols, axis=1) # corrected genome count dataframe
-    #
-    # for epiweek in sorted(date_intersection):
-    #     for idx, row in dfP.iterrows():
-    #         prop = dfP.loc[idx, epiweek]
-    #         if prop > 0:
-    #             print(prop)
-    #             zscore = (prop - mean_prop) / std_prop
-    #             dfZ.loc[idx, epiweek] = zscore # add observed sampling proportion
-    #             # print(prop, zscore, mean_prop, std_prop)
-    #             print(zscore)
-    #
-    #
-    # dfZ.to_csv(output2, sep='\t', index=True)

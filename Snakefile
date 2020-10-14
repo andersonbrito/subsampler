@@ -1,11 +1,12 @@
 rule arguments:
 	params:
 		sequences = "data/gisaid_hcov-19.fasta",
-		metadata = "data/metadata_global.tsv",
-		case_data = "data/matrix_cases_days_global.tsv",
+		metadata = "data/metadata_nextstrain.tsv",
+		case_data = "data/time_series_covid19_confirmed_US_reformatted.tsv",
 		include = "config/keep.txt",
 		exclude = "config/remove.txt",
-		index_column = "iso",
+		drop = "config/batch_removal.tsv",
+		index_column = "state_code",
 		date_column = "date",
 		baseline = "0.002",
 		refgenome_size = "29420",

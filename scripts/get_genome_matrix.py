@@ -22,7 +22,6 @@ if __name__ == '__main__':
     metadata = args.metadata
     geo_col = args.index_column
     extra_cols = args.extra_columns
-    # extra_cols = [col.strip() for col in args.extra_columns[0].split()]
     date_col = args.date_column
     group_by = [geo_col, date_col]
     start_date = args.start_date
@@ -33,7 +32,7 @@ if __name__ == '__main__':
     # metadata = path + 'data/metadata_nextstrain.tsv'
     # output = path + 'matrix_genomes_daily.tsv'
     #
-    # geo_col = 'state_code'
+    # geo_col = 'code'
     # date_col = 'date'
     # extra_cols = ['region_exposure', 'country_exposure']
     # group_by = [geo_col, date_col]
@@ -48,6 +47,14 @@ if __name__ == '__main__':
     # input genome and case counts per epiweek
     df = pd.read_csv(metadata, encoding='utf-8', sep='\t', dtype=str)
     df.fillna('', inplace=True)
+
+    # fix exposure
+    geolevels = ['region', 'country', 'division']
+    for level in geolevels:
+        exposure_column = level + '_exposure'
+        for idx, row in df.iterrows():
+            if df.loc[idx, exposure_column].lower() in ['', 'unknown']:
+                df.loc[idx, exposure_column] = df.loc[idx, level]
 
     # get ISO alpha3 country codes
     isos = {}
@@ -126,9 +133,9 @@ if __name__ == '__main__':
         'Wyoming': 'WY'
     }
     # add state code
-    if 'state_code' not in df.columns.to_list():
-        df.insert(1, 'state_code', '')
-        df['state_code'] = df['division_exposure'].apply(lambda x: us_state_abbrev[x] if x in us_state_abbrev else '')
+    if 'code' not in df.columns.to_list():
+        df.insert(1, 'code', '')
+        df['code'] = df['division_exposure'].apply(lambda x: us_state_abbrev[x] if x in us_state_abbrev else '')
 
 
     # add country iso code
@@ -191,6 +198,9 @@ if __name__ == '__main__':
 
 
     # add other columns, if available
+    if extra_cols == None:
+        extra_cols = []
+
     for column in extra_cols:
         if column in df.columns.to_list():
             df3.insert(0, column, '')

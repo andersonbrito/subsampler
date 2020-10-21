@@ -8,38 +8,45 @@ import argparse
 import pandas as pd
 import pycountry_convert as pcc
 import pycountry
+import os
 
 Entrez.email = "Your.Name.Here@example.org"
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description="Append newly sequenced genomes to current genome dataset, and export metadata",
+        description="Fetch newly sequenced SARS-CoV-2 genomes from NCBI",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument("--fasta", required=True, help="FASTA file with all existing genomes already downloaded")
+    parser.add_argument("--metadata", required=True, help="Nextstrain metadata file")
     parser.add_argument("--skip", required=True, help="TXT file with accession number of genomes already downloaded")
-    parser.add_argument("--metadata", required=True, help="Newly generated metadata file")
+    parser.add_argument("--mode", required=False, nargs=1, type=str,  default='separate', choices=['separate', 'append', 'mock'],
+                        help="How the output will be exported? As separate file, or appending to existing file?")
     args = parser.parse_args()
 
-    ncbi_fasta = args.fasta
-    redundant = args.skip
+    sequences = args.fasta
+    skip = args.skip
     metadata = args.metadata
+    how = args.mode[0]
 
-    # path = '/Users/anderson/GLab Dropbox/Anderson Brito/projects/ncov_2ndWave/nextstrain/test/'
-    # ncbi_fasta = path + 'sequences.fasta'
-    # redundant = path + 'skip.txt'
-    # metadata = path + 'metadata_short.tsv'
 
+    # path = '/Users/anderson/GLab Dropbox/Anderson Brito/projects/ncov_bubble/nextstrain/run12_20201008_batch15/sampling_prop/data/'
+    # sequences = path + 'gisaid_hcov-19.fasta'
+    # skip = path + 'skip.txt'
+    # metadata = path + 'metadata_nextstrain.tsv'
+    # how = 'separate'
 
     # existing ncbi fasta file
     existing_ncbi = []
-    for fasta in SeqIO.parse(open(ncbi_fasta), 'fasta'):
-        id = str(fasta.description).split('|')[1]
+    for fasta in SeqIO.parse(open(sequences), 'fasta'):
+        id = str(fasta.description)
+        if '|' in id:
+            id = id.replace('hCoV-19/', '').split('|')[0].replace(' ', '')
         existing_ncbi.append(id)
 
+
     dfN = pd.read_csv(metadata, encoding='utf-8', sep='\t', dtype=str)
-    # ns_entries = dfN['strain'].to_list()
-    dup_seqs = [accno.strip() for accno in open(redundant, 'r').readlines() if accno[0] not in ['\n', '#']]
+    skip_list = [accno.strip() for accno in open(skip, 'r').readlines() if accno[0] not in ['\n', '#']]
 
     inspect = Entrez.esearch(db="nucleotide", term="txid2697049[Organism] 25000:35000[SLEN]", idtype="acc")
     total_entries = int(Entrez.read(inspect)['Count'])
@@ -56,6 +63,23 @@ if __name__ == '__main__':
         else:
             return state_names[country + '-' + accronym]
 
+    # open output file
+    outfile = ''
+    if how == 'separate': # save in a separate file
+        print('############################################')
+        outfile1 = open(sequences.split('.')[0] + '_ncbi.fasta', 'w')
+        outfile1.write('')
+        outfile2 = open(metadata.split('.')[0] + '_ncbi.tsv', 'w')
+        outfile2.write('\t'.join(dfN.columns.to_list()) + '\n')
+
+    elif how == 'append':
+        outfile1 = open(sequences, 'a')
+        outfile1.write('')
+        outfile2 = metadata
+    else:
+        print('\nNo output will be generated (mock run)\n')
+
+
     ### START NCBI SEARCH
 
     start_at = 1
@@ -63,8 +87,8 @@ if __name__ == '__main__':
     today = time.strftime('%Y-%m-%d', time.gmtime())
 
     # export new NCBI entries
-    export_ncbi = open(ncbi_fasta, 'a')
-    new_redundants = open(redundant, 'a')
+    # output_ncbi = open(sequences.split('.')[0] + '_ncbi.fasta', 'w')
+    skip_extra = open(skip, 'a')
     comment = ''
 
     # print(dfN['gisaid_epi_isl'][dfN['strain'] == 'England/LIVE-9B50B/2020'].values[0])
@@ -83,18 +107,17 @@ if __name__ == '__main__':
 
             previous = 1
             count = 1
-            search_list = [accno.split('.')[0] for accno in record['IdList'] if accno.split('.')[0] not in dup_seqs + existing_ncbi]
-            excluded = [accno.split('.')[0] for accno in record['IdList'] if accno.split('.')[0] in dup_seqs + existing_ncbi]
+            search_list = [accno.split('.')[0] for accno in record['IdList'] if accno.split('.')[0] not in skip_list]# + existing_ncbi]
+            excluded = [accno.split('.')[0] for accno in record['IdList'] if accno.split('.')[0] in skip_list]# + existing_ncbi]
             c += len(excluded)
 
-            print('A total of ' + str(len(excluded)) + ' genomes are listed in ' + redundant + ', and were not re-processed in this cycle.')
+            print('A total of ' + str(len(excluded)) + ' genomes are listed in ' + skip + ', and were not re-processed in this cycle.')
             for accno in search_list:#[245:250]:
-                # print(accno)
                 print('\n' + str(c) + '/' + str(total_entries))
 
                 # exporting accession numbers of processed GISAID-NCBI duplicates
-                if accno in dup_seqs + existing_ncbi:  # and strain in dfN['strain'].to_list():
-                    print("\t- " + accno +  ': Genome already processed')
+                if accno in skip_list:# + existing_ncbi:  # and strain in dfN['strain'].to_list():
+                    print("\t- " + accno + ': Genome already present in dataset. Skipping...')
                 else:
                     accno = accno.split('.')[0]
                     new_row = {} # to update metadata dataframe
@@ -123,7 +146,7 @@ if __name__ == '__main__':
                                 authors = feature.authors.split(",")[0] + " et al"
                                 if feature.title =='Direct Submission':
                                     date_submitted = pd.to_datetime(feature.journal.split('(')[1].split(')')[0]).strftime('%Y-%m-%d')
-                                    print(date_submitted)
+                                    # print(date_submitted)
                             for feature in seq_record.features:
                                 if feature.type == 'source':
                                     try:
@@ -184,9 +207,9 @@ if __name__ == '__main__':
                             c += 1
                             if comment == '':
                                 comment = '\n# Processed on ' + today + '\n'
-                                new_redundants.write(comment)
-                            new_redundants.write(accno + '\n')
-                            new_redundants. flush()
+                                skip_extra.write(comment)
+                            skip_extra.write(accno + '\n')
+                            skip_extra. flush()
                             print('\t- ' + accno + ': Missing strain, country or date metadata. Skipping... ')
 
                             continue
@@ -197,33 +220,43 @@ if __name__ == '__main__':
                         except:
                             epi_isl = ''
 
-                        # # exporting accession numbers of processed GISAID-NCBI duplicates
-                        # if accno in dup_seqs + existing_ncbi:# and strain in dfN['strain'].to_list():
-                        #         print(str(c) + '/' + str(total_entries) + " - Sequence already processed: " + accno)
 
                         # exporting new metadata lines
                         if strain not in dfN['strain'].to_list():# and strain.replace('_', '-') not in dfN['strain'].to_list():
+                            # exporting new NCBI sequences
+                            if accno not in existing_ncbi and epi_isl in ['?', '', np.nan]:
+                                if how == 'separate':
+                                    outfile1.write('>' + ncbi_header + '\n' + sequence + '\n')
+                                    outfile1.flush()
+
+                                elif how == 'append':
+                                    outfile1.write('>' + ncbi_header + '\n' + sequence + '\n')
+                                    outfile1.flush()
+                                existing_ncbi.append(accno)
+                                print('\t- Exporting NCBI fasta: ' + ncbi_header)
+
+
                             dfG = pd.DataFrame(columns=dfN.columns.to_list())
                             dfG = dfG.append(new_row, ignore_index=True)
-                            dfG.to_csv(metadata, sep='\t', index=False, header=False, mode='a')
+                            if how == 'separate':
+                                # if os.path.getsize(outfile2) > 0:
+                                #     dfG.to_csv(outfile2, sep='\t', index=False, header=False, mode='a')
+                                # else:
+                                dfG.to_csv(outfile2, sep='\t', index=False, header=False, mode='w')
+                            elif how == 'append':
+                                dfG.to_csv(outfile2, sep='\t', index=False, header=False, mode='a')
 
                             # print(list(dfN.loc[dfN['strain'] == strain].values))
                             print("\t- Exporting NCBI metadata: " + ncbi_header)
 
-                            # exporting new NCBI sequences
-                            if accno not in existing_ncbi and epi_isl in ['?', '', np.nan]:
-                                export_ncbi.write('>' + ncbi_header + '\n' + sequence + '\n')
-                                export_ncbi.flush()
-                                existing_ncbi.append(accno)
-                                print('\t- Exporting NCBI fasta: ' + ncbi_header)
 
                         else:
-                            # if not epi_isl in ['?', '', np.nan] and accno not in dup_seqs:
+                            # if not epi_isl in ['?', '', np.nan] and accno not in skip_list:
                             if comment == '':
                                 comment = '\n# Processed on ' + today + '\n'
-                                new_redundants.write(comment)
-                            new_redundants.write(accno + '\n')
-                            new_redundants.flush()
+                                skip_extra.write(comment)
+                            skip_extra.write(accno + '\n')
+                            skip_extra.flush()
                             print('\t- ' + accno+ ': GISAID entry. Skipping... ')
                     except:
                         print("\t- " + accno + ": entry not found on NCBI, or backend searching failed")

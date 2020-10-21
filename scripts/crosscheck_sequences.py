@@ -6,14 +6,14 @@ import argparse
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description="Filter newly sequenced genomes not yet added in an existing FASTA dataset of sequences",
+        description="Filter genomes not yet added in an existing FASTA dataset",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument("--dataset", required=True, help="FASTA file with pre-existing sequences")
     parser.add_argument("--new-genomes", required=True, help="FASTA file with new sequences")
     parser.add_argument("--max-missing", required=False, type=int,  default='30', help="Maximum percentage of Ns or gaps (int: 1-100)")
     parser.add_argument("--how", required=False, nargs=1, type=str,  default='separate', choices=['separate', 'append', 'mock'],
-                        help="How the new sequences will be exported? In a 'separate' file; appended to the 'input' file, or not exported at all ('mock')?")
+                        help="How new sequences will be exported? In a 'separate' file; appended to the 'input' file, or not exported at all ('mock')?")
     args = parser.parse_args()
 
     dataset = args.dataset
@@ -58,7 +58,7 @@ if __name__ == '__main__':
         print('############################################')
         outfile = open(dataset.split('.')[0] + '_extra.fasta', 'w')
         outfile.write('')
-    elif how == 'input':
+    elif how == 'append':
         outfile = open(dataset, 'a')
         outfile.write('')
     else:
@@ -69,7 +69,6 @@ if __name__ == '__main__':
     # scan newly released genomes
     already_found = []
     new_entries = []
-    outfile.write('')
     for entry in SeqIO.parse(open(new_genomes),'fasta'):
         id, seq = entry.description, str(entry.seq)
         strain = id.replace('hCoV-19/', '').split('|')[0].replace(' ', '')
@@ -79,15 +78,20 @@ if __name__ == '__main__':
             print('Partial genome: ' + str(size) + ' bp ' + ' - ' + id + ' is too short, and was ignored...')
             too_small.append(id)
         else:
-            if strain not in preexisting and strain.replace('-', '').replace('_', '') not in preexist_simple:
-                print('+ ' + strain + ': new genome')
-                entry = '>' + strain + '\n' + str(seq) + '\n'
-                if how != 'mock':
-                    outfile.write(entry)
-                new_entries.append(strain)
+            if strain not in preexisting:
+                if strain not in already_found and strain not in new_entries:
+                    print('+ ' + strain + ': new genome')
+                    entry = '>' + strain + '\n' + str(seq) + '\n'
+                    if how != 'mock':
+                        outfile.write(entry)
+                    new_entries.append(strain)
+                    # already_found.append(strain)
+                else:
+                    print('\t- ' + strain + ': this sequence was already downloaded. Skipping...')
+                    duplicates.append(strain)
             else:
-                print('\t- ' + strain + ': this sequence was already downloaded. Skipping...')
                 already_found.append(strain)
+
 
     if len(already_found) > 0:
         print('\n### The following sequences are already in the dataset:\n')
@@ -101,14 +105,15 @@ if __name__ == '__main__':
             print('\t' + str(num + 1) + '. ' + entry)
         print('\nA total of ' + str(len(new_entries)) + ' new sequences were found.\n')
 
-    if len(duplicates) > 0:
-        print('\n### WARNING: the original dataset has duplicates:\n')
-        for num, entry in enumerate(duplicates):
-            print('\t' + str(num + 1) + '. ' + entry)
-        print('\nA total of ' + str(len(duplicates)) + ' duplicates were detected.\n')
-
     if len(too_small) > 0:
-        print('\n### WARNING: the existing dataset contain partial genomes:\n')
+        print('\n### Some partial genomes were detected:\n')
         for num, entry in enumerate(too_small):
             print('\t' + str(num + 1) + '. ' + entry)
-        print('\nA total of ' + str(len(too_small)) + ' partial genomes were detected and ignored.\n')
+        print('\nA total of ' + str(len(too_small)) + ' partial genomes were detected and ignored (coverage < ' + str(100 - max_gaps) + '%).\n')
+
+    if len(duplicates) > 0:
+        print('\n### Some duplicates were detected:\n')
+        for num, entry in enumerate(duplicates):
+            print('\t' + str(num + 1) + '. ' + entry)
+        print('\nA total of ' + str(len(duplicates)) + ' duplicates were detected and ignored.\n')
+

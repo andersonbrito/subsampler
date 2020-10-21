@@ -170,10 +170,12 @@ if __name__ == '__main__':
 
 
     # drop rows with unwanted samples
-    for line in open(drop_file).readlines():
-        column, value = line.strip().split('\t')
-        print('Batch removal: column=' + column + '; value=' + value)
-        dfM = dfM[~dfM[column].isin([value])] # batch drop specific samples
+    drop_lines = open(drop_file).readlines()
+    if len(drop_lines) > 0:
+        for line in drop_lines:
+            column, value = line.strip().split('\t')
+            print('Batch removal: column=' + column + '; value=' + value)
+            dfM = dfM[~dfM[column].isin([value])] # batch drop specific samples
 
 
     ### FIX OR ADD NEW COLUMNS IN THE METADATA
@@ -277,9 +279,9 @@ if __name__ == '__main__':
         'Wisconsin': 'WI',
         'Wyoming': 'WY'
     }
-    if 'state_code' not in dfM.columns.to_list():
-        dfM.insert(1, 'state_code', '')
-        dfM['state_code'] = dfM['division_exposure'].apply(lambda x: us_state_abbrev[x] if x in us_state_abbrev else '')
+    if 'code' not in dfM.columns.to_list():
+        dfM.insert(1, 'code', '')
+        dfM['code'] = dfM['division_exposure'].apply(lambda x: us_state_abbrev[x] if x in us_state_abbrev else '')
 
 
     # empty matrix dataframe

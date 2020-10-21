@@ -2,18 +2,18 @@ rule arguments:
 	params:
 		sequences = "data/gisaid_hcov-19.fasta",
 		metadata = "data/metadata_nextstrain.tsv",
-		case_data = "data/time_series_covid19_confirmed_US_reformatted.tsv",
+		case_data = "data/time_series_covid19_confirmed_global_reformatted.tsv",
 		include = "config/keep.txt",
 		exclude = "config/remove.txt",
 		drop = "config/batch_removal.tsv",
-		index_column = "state_code",
+		index_column = "iso",
 		date_column = "date",
-		baseline = "0.002",
+		baseline = "0.003",
 		refgenome_size = "29420",
 		max_missing = "5",
 		seed_num = "2007",
 		start_date = "2019-12-15",
-		end_date = "2020-08-29"
+		end_date = "2020-10-20"
 
 
 arguments = rules.arguments.params
@@ -28,7 +28,7 @@ rule genome_matrix:
 		metadata = arguments.metadata
 	params:
 		index = arguments.index_column,
-		extra_columns = "region country",
+		extra_columns = "country_exposure",
 		date = arguments.date_column
 	output:
 		matrix = "outputs/genome_matrix_days.tsv"
@@ -106,7 +106,8 @@ rule subsample:
 		metadata = arguments.metadata,
 		corrected_matrix = "outputs/matrix_genomes_epiweeks_corrected.tsv",
 		keep = arguments.include,
-		remove = arguments.exclude
+		remove = arguments.exclude,
+		drop_file = arguments.drop
 	params:
 		size = arguments.refgenome_size,
 		missing = arguments.max_missing,
@@ -130,6 +131,7 @@ rule subsample:
 			--refgenome-size {params.size} \
 			--keep {input.keep} \
 			--remove {input.remove} \
+			--drop {input.drop_file} \
 			--seed {params.seed} \
 			--index-column {params.index} \
 			--date-column {params.date} \

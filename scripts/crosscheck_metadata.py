@@ -35,7 +35,7 @@ if __name__ == '__main__':
     df1 = pd.read_csv(metadata1, encoding='utf-8', sep='\t', dtype='str')
     preexisting = list(set(df1['strain'].to_list()))
     df1 = df1[df1['strain'].isin(preexisting)]
-
+    columns = df1.columns.to_list()
 
     print('\n### Processing new entries...')
     # scan new metadata file
@@ -43,6 +43,7 @@ if __name__ == '__main__':
     new_entries = list(set(df2['strain'].to_list()))
     df2 = df2[df2['strain'].isin(new_entries)]
     df2 = df2[~df2['strain'].isin(preexisting)] # only new entries
+    df2 = df2[columns]
 
     # append dataframes
     df3 = pd.concat([df1, df2], ignore_index='True')

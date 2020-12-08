@@ -8,12 +8,12 @@ rule arguments:
 		drop = "config/batch_removal.tsv",
 		index_column = "iso",
 		date_column = "date",
-		baseline = "0.003",
-		refgenome_size = "29420",
-		max_missing = "5",
+		baseline = "0.001",
+		refgenome_size = "29930",
+		max_missing = "10",
 		seed_num = "2007",
 		start_date = "2019-12-15",
-		end_date = "2020-10-20"
+		end_date = "2020-11-07"
 
 
 arguments = rules.arguments.params

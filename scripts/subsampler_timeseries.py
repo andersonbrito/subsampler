@@ -328,7 +328,6 @@ if __name__ == '__main__':
                 # print(name, epiweek, '-', available_samples, target_sampling, bias)
 
                 existing = dfG.loc[name, epiweek] # pre-selected sequences
-                # print(existing)
 
                 if target_sampling >= available_samples:  # if requested sample number is higher than available genomes, get all
                     sampled = [sample for sample in dfEpiweek['strain'].to_list() if sample not in existing]
@@ -338,11 +337,11 @@ if __name__ == '__main__':
                     sampled = random.sample(pool, 1)
                 else:
                     pool = [sample for sample in dfEpiweek['strain'].to_list() if sample not in existing]
+                    if target_sampling < len(existing):
+                        target_sampling = len(existing)
                     sampled = random.sample(pool, target_sampling - len(existing))
-                    # print(sampled, len(sampled))
 
                 dfG.at[name, epiweek] += sampled # add selected samples to dataframe
-        # print(dfG.values.tolist())
 
 
     # export output

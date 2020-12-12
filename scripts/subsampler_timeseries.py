@@ -19,7 +19,8 @@ if __name__ == '__main__':
     parser.add_argument("--refgenome-size", required=True, type=int,  help="Reference genome size")
     parser.add_argument("--keep", required=False, help="List of samples to keep, in all instances")
     parser.add_argument("--remove", required=False, help="List of samples to remove, in all instances")
-    parser.add_argument("--drop", required=False, help="TSV file listing columns/values of samples to be dropped")
+    parser.add_argument("--drop_list", required=False, help="TSV file listing columns/values of samples to be dropped")
+    parser.add_argument("--include_list", required=False, help="TSV file listing columns/values of samples to be dropped")
     parser.add_argument("--seed", required=False, type=int,  help="Seed number for pseudorandom sampling of genomes")
     parser.add_argument("--index-column", required=True, help="Metadata column with unique geographic information")
     parser.add_argument("--date-column", required=True, type=str,  help="Metadata column containing the collection dates")
@@ -39,7 +40,8 @@ if __name__ == '__main__':
     max_gaps = args.max_missing
     keep = args.keep
     remove = args.remove
-    drop_file = args.drop
+    drop_file = args.drop_list
+    include_file = args.include_list
     seed = args.seed
     geo_level = args.index_column
     date_col = args.date_column
@@ -165,17 +167,8 @@ if __name__ == '__main__':
                 remove_sequences.append(id)
 
     # keep or remove specific sequences
-    dfM = dfM[dfM['strain'].isin(intersection)]
+    dfM = dfM[dfM['strain'].isin(intersection)] # include only sequences with metadata
     dfM = dfM[~dfM['strain'].isin(remove_sequences)] # remove bad quality sequences
-
-
-    # drop rows with unwanted samples
-    drop_lines = open(drop_file).readlines()
-    if len(drop_lines) > 0:
-        for line in drop_lines:
-            column, value = line.strip().split('\t')
-            print('Batch removal: column=' + column + '; value=' + value)
-            dfM = dfM[~dfM[column].isin([value])] # batch drop specific samples
 
 
     ### FIX OR ADD NEW COLUMNS IN THE METADATA
@@ -310,14 +303,36 @@ if __name__ == '__main__':
     # print(dfG)
     # print(seed)
 
+
+    dfF = pd.DataFrame(columns=dfM.columns.to_list())
+
+    # include only entries matching certain categories
+    include_lines = open(include_file).readlines()
+    if len(include_lines) > 0:
+        for line in include_lines:
+            column, value = line.strip().split('\t')
+            print('Including lines: column=' + column + '; value=' + value)
+            chunk = dfM[dfM[column].isin([value])]
+            dfF = dfF.append(chunk, ignore_index=True)
+    else:
+        dfF = dfM
+
+    # drop rows with unwanted samples
+    drop_lines = open(drop_file).readlines()
+    if len(drop_lines) > 0:
+        for line in drop_lines:
+            column, value = line.strip().split('\t')
+            print('Batch removal: column=' + column + '; value=' + value)
+            dfF = dfF[~dfF[column].isin([value])] # batch drop specific samples
+
+
     print('\n### Starting sampling process...\n')
     # sampling process
     random.seed(seed) # pseudo-random sampling seed
-    glevel = dfM.groupby(geo_level)
+    glevel = dfF.groupby(geo_level)
     for name, dfLevel in glevel:
         if name in dfS[geo_level].to_list():
             gEpiweek = dfLevel.groupby('epiweek') # geolevel-specific dataframe
-            # total_genomes = dfL[geo_level].count() #
             for epiweek, dfEpiweek in gEpiweek:
                 available_samples = dfEpiweek['epiweek'].count()  # genomes in bin
                 try:

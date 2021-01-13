@@ -2,19 +2,19 @@ rule arguments:
 	params:
 		sequences = "data/gisaid_hcov-19.fasta",
 		metadata = "data/metadata_nextstrain.tsv",
-		case_data = "data/time_series_covid19_confirmed_US_reformatted.tsv",
+		case_data = "data/time_series_covid19_global_reformatted.tsv",
 		keep_file = "config/keep.txt",
 		remove_file = "config/remove.txt",
 		include_file = "config/strict_inclusion.tsv",
 		drop_file = "config/batch_removal.tsv",
-		index_column = "code",
+		index_column = "iso",
 		date_column = "date",
 		baseline = "0.0001",
 		refgenome_size = "29930",
 		max_missing = "10",
 		seed_num = "2007",
 		start_date = "2019-12-15",
-		end_date = "2020-11-07"
+		end_date = "2020-12-31"
 
 
 arguments = rules.arguments.params
@@ -95,7 +95,6 @@ rule correct_bias:
 			--output2 {output.output2} \
 			--output3 {output.output3}
 		"""
-
 
 rule subsample:
 	message:

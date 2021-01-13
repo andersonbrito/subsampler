@@ -6,20 +6,18 @@
 # Email: andersonfbrito@gmail.com
 # Python: 3
 #
-#   .py -> This code reads DBF files from DataSUS (Brazil's
-#                       Ministry of Health), group state level data as
-#                       national level case counts, and export them to
-#                       a CSV file.
+#  get_daily_matrix_global.py.py -> This code converts Johns Hopkins (US)
+#                                   dashboard raw data in CSV into a TSV,
+#                                   with reformatted dates and columns.
 #
-# Release date: 14/Feb/2020
-# Last update: 14/Feb/2020
+#
+# Release date: 2020-09-16
+# Last update: 2020-12-08
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 import os
 import pandas as pd
-import pycountry_convert as pyCountry
-import pycountry
 import argparse
 import time
 
@@ -29,16 +27,12 @@ if __name__ == '__main__':
         description="Filter newly sequenced genomes not yet added in an existing FASTA dataset of sequences",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    parser.add_argument("--input", required=True, help="Johns Hopkins, US daily case counts file")
+    parser.add_argument("--input", required=False, help="Johns Hopkins, US daily case counts file")
+    parser.add_argument("--download", required=True, nargs=1, type=str, default='yes',
+                        choices=['yes', 'no'], help="Download US case series from Johns Hopkins University?")
     parser.add_argument("--start-date", required=False, type=str,  help="Start date in YYYY-MM-DD format")
     parser.add_argument("--end-date", required=False, type=str,  help="End date in YYYY-MM-DD format")
     args = parser.parse_args()
-
-    input = args.input
-    start_date = args.start_date
-    end_date = args.end_date
-    separator = ','
-
 
     # path = '/Users/anderson/GLab Dropbox/Anderson Brito/projects/ncov_bubble/nextstrain/run12_20201008_batch15/sampling_prop/data/'
     # input = 'time_series_covid19_confirmed_US.csv'
@@ -46,12 +40,24 @@ if __name__ == '__main__':
     # end_date = '2020-09-30' # end date of period of interest
     # separator = ','
 
+    download = args.download[0]
+
+    path = os.getcwd()
+    if download == 'yes':
+        if 'time_series_covid19_usa.csv' not in os.listdir(path):
+            url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv'
+            os.system('wget %s' % url)
+            os.system('mv %s time_series_covid19_usa.csv' % url.split('/')[-1])
+        df = pd.read_csv('time_series_covid19_usa.csv', encoding='utf-8', sep=',', dtype='str')
+    else:
+        input = args.input
+        df = pd.read_csv(input, encoding='utf-8', sep=',', dtype='str')
+
+    start_date = args.start_date
+    end_date = args.end_date
 
     remove = ['Diamond Princess', 'Grand Princess']
     fix_names = {}
-    
-
-    df = pd.read_csv(input, encoding='utf-8', sep=separator, dtype=str)
 
     # list of date columns
     date_columns = [column for column in df.columns.to_list() if column[0].isdecimal()]
@@ -181,5 +187,5 @@ if __name__ == '__main__':
     # print(df.head)
     
     # save processed metadata
-    df.to_csv(input.split('.')[0] + '_reformatted.tsv', sep='\t', index=False)
-    print('\nOutput successfully exported: ' + input.split('.')[0] + '_reformatted.tsv\n')
+    df.to_csv('time_series_covid19_usa_reformatted.tsv', sep='\t', index=False)
+    print('\nOutput successfully exported: ' + 'time_series_covid19_usa_reformatted.tsv\n')

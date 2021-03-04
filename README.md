@@ -19,6 +19,7 @@ https://www.biorxiv.org/content/10.1101/2020.07.01.181867v1
 * conda
 * Fasta file containing the sampled genomes
 * Metadata file containing at least sample names, date, and geographic locations
+* Matrix of daily case counts per geographic location (as listed in the metadata)
 * Create conda environment
 
 # Installation
@@ -33,6 +34,7 @@ conda activate subsampler
 
 ```
 conda activate subsampler
+snakemake subsampler
 
 ```
 

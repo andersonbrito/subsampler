@@ -35,7 +35,6 @@ conda activate subsampler
 ```
 conda activate subsampler
 snakemake subsampler
-
 ```
 
 

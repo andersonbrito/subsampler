@@ -50,13 +50,13 @@ _`subsampler` can perform subsampling using epidemiological data from any geogra
 
 * Read daily case data file
 * Convert date format to YYYY-MM-DD
-* Generate matrix of case counts, locations X days
+* Generate matrix of case counts, locations versus days
 
 ## Creating genome matrix
 
 * Read genomic metadata file
 * Convert date format to YYYY-MM-DD
-* Generate matrix of genome counts, locations X days
+* Generate matrix of genome counts, locations versus days
 
 
 ## Aggregating genomic and epidemiological data per epiweek

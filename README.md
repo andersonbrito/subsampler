@@ -80,7 +80,6 @@ _`subsampler` can perform subsampling using epidemiological data from any geogra
 * Generate subsampled sequence, and metadata file
 * Generate report with number of sampled genomes per location
 
-- 
 
 
 <!-- 

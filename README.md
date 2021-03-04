@@ -1,65 +1,67 @@
 ![alt text](https://github.com/andersonbrito/subsampler/blob/master/images/logo.png "subsampler")
 
-**v0.0.8 With improved Illumina sgRNA detection**
+# subsampler
 
-# periscope
+A tool to subsample genomic data guided by epidemiological time series data.
 
-A tool to quantify sub-genomic RNA (sgRNA) expression in SARS-CoV-2 artic network amplicon sequencing data.
-Initial classification of reads into sub-genomic or not based on https://www.biorxiv.org/content/10.1101/2020.04.10.029454v1.abstract
-
+<!-- 
 # Citing
 
 Please cite our pre-print if you use this tool in any publications:
 
 https://www.biorxiv.org/content/10.1101/2020.07.01.181867v1
+ -->
 
 # Requirements
-periscope runs on MacOS and Linux. We have also confirmed the tool runs under windows 10 unix subsystem.
+`subsampler` runs on MacOS and Linux.
 
 
 * conda
-* Your raw fastq files from the artic protocol
-* Install periscope
+* Fasta file containing the sampled genomes
+* Metadata file containing at least sample names, date, and geographic locations
+* Create conda environment
 
 # Installation
 ```
-git clone https://github.com/sheffield-bioinformatics-core/periscope.git && cd periscope
-conda env create -f environment.yml
-conda activate periscope
-pip install .
+git clone https://github.com/andersonbrito/subsampler.git
+cd config
+conda env create -f subsampler.yml
+conda activate subsampler
 ```
 
 # Execution
 
 ```
-conda activate periscope
+conda activate subsampler
 
-periscope \
-    --fastq-dir <PATH_TO_DEMUXED_FASTQ> \ (ont only)
-    OR
-    --fastq <FULL_PATH_OF_FASTQ_FILE(s)> \ (space separated list of fastq files, you MUST use this for Illumina data)
-    --output-prefix <PREFIX> \
-    --sample <SAMPLE_NAME> \
-    --artic-primers <ASSAY_VERSION; V1,V2,V3 or 2kb> \
-    --resources <PATH_TO_PERISCOPE_RESOURCES_FOLDER> \
-    --technology <SEQUECNING TECH; ont or illumina> \
-    --threads <THREADS_FOR_MAPPING> 
 ```
 
-`output-prefix` will be the directory and start of the filename for the output.
-
-So if you put `./SAMPLE1` for this argument outputs will go in the current working directory prefixed by "SAMPLE1". 
-
-***Note*** - for illumina data please use --fastq <FASTQ_R1>.fastq.gz <FASTQ_R2>.fastq.gz and --technology illumina
-
-## `/tmp` Issues
-
-If you have issues with `tmp` this is because pybedtools writes there. v0.0.3 contains a fix, and you can also specify `--tmp` and redirect this somewhere else
 
 # Pipeline overview
 
 ![alt text](https://github.com/sheffield-bioinformatics-core/periscope/blob/master/workflow.png "periscope")<!-- .element height="10%" width="10%" -->
 __Figure 1. Workflow Overview__ 
+
+
+## Creating case count matrix
+
+_subsampler can perform subsampling using epidemiological data from any geographical level (per country, per states, etc) provided daily case counts are available_
+
+* 
+
+## Creating genome matrix
+
+
+
+## aggregating genomic and epidemiological data per epiweek
+
+
+
+## Correcting genomic sampling bias
+
+
+## Perform subsampling
+
 
 ## Pre-Processing
 

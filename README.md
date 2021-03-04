@@ -1,4 +1,4 @@
-![alt text](https://github.com/sheffield-bioinformatics-core/periscope/blob/master/periscope.png "periscope")
+![alt text](https://github.com/andersonbrito/subsampler/blob/master/images/logo.png "subsampler")
 
 **v0.0.8 With improved Illumina sgRNA detection**
 

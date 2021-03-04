@@ -39,7 +39,7 @@ conda activate subsampler
 
 # Pipeline overview
 
-![alt text](https://github.com/sheffield-bioinformatics-core/periscope/blob/master/workflow.png "periscope")<!-- .element height="10%" width="10%" -->
+![alt text](https://github.com/andersonbrito/subsampler/blob/master/images/workflow.png "subsampler")
 __Figure 1. Workflow Overview__ 
 
 

@@ -45,68 +45,45 @@ __Figure 1. Workflow Overview__
 
 ## Creating case count matrix
 
-_subsampler can perform subsampling using epidemiological data from any geographical level (per country, per states, etc) provided daily case counts are available_
+_`subsampler` can perform subsampling using epidemiological data from any geographical level (per country, per states, etc) provided daily case counts are available_
 
-* 
+* Read daily case data file
+* Convert date format to YYYY-MM-DD
+* Generate matrix of case counts, locations X days
 
 ## Creating genome matrix
 
+* Read genomic metadata file
+* Convert date format to YYYY-MM-DD
+* Generate matrix of genome counts, locations X days
 
 
-## aggregating genomic and epidemiological data per epiweek
+## Aggregating genomic and epidemiological data per epiweek
 
-
+* Combine genomic and case counts per epidemiological week
+* Drop data from time periods outside the boundaries defined by `start_date` and `end_date`.
 
 ## Correcting genomic sampling bias
+
+* Read matrices of epiweek genomic and case counts
+* Generate matrix reporting the observed sampling proportions per epiweek
+* Generate matrix reporting the sampling bias (under- and oversampling) given the baseline
+* Generate matrix with the corrected genome count per week, given the pre-defined baseline sampling proportion
 
 
 ## Perform subsampling
 
-
-## Pre-Processing
-
-* Collect demutiplexed pass fastqs
-* Remap RAW artic protocol reads
-
-## Counting
-
-_This step takes roughly 1minute per 10k reads_
-_Our median read count is ~250k and this will take around 25minutes_
-
-* Read bam file
-* Filter unmapped and secondary alignments
-* Assign amplicon to read (using artic align_trim.py)
-* Search for leader sequence
-* Assign read to ORF
-* Classify read (see Figure 2)
-* Normalise a few ways
-
-![alt text](https://github.com/sheffield-bioinformatics-core/periscope/blob/master/read_classification.png "periscope")<!-- .element height="10%" width="10%" -->
-__Figure 2. Read Classification Algorithm__ 
-
-## Normalisation
-
-### ONT Data
-
-We have taken two approaches, a global normalisation based on mapped read counts or a local normalisation based on gRNA from the same amplicon.
-
-* gRNA or sgRNA Per 100,000 mapped reads (gRPHT or sgRPHT)
-    * We do this per amplicon and sum them in instances where multiple amplicons contribute to the final ORF count
-* sgRNA can be normalised to per 1000 gRNA reads from the same amplicon - sgRPTg (normalising for amplicon efficiency differences)
-    * There are things you need to note here:
-        * multiple amplicons can contribute to reads which support the same sgRNA
-        * we normalise on a per amplicon level and then sum these to get an overall normalised count
-
-### Illumina Data
-
-Ilumina data is still a work in progress, as of v0.0.8 you can get raw sgRNA counts and counts normalised to the average coverage around the ORF TRS start site.
-
-It is worth noting this follows a slightly different algorithm, relying instead on soft clipping. The ratoinale here is that illumina data is more accurate therefore we
-can detect shorter matches to the leader.
+* Read sequence, metadata and corrected genomic count matrix
+* Read lists of genomes to be kept or remove in all instances (if provided)
+* Read batch removal file, to exclude genomes from certain metadata categories
+* Perform subsampling guided by case counts per epiweek
+* Generate subsampled sequence, and metadata file
+* Generate report with number of sampled genomes per location
 
 - 
 
 
+<!-- 
 ## Outputs:
 
 #### <OUTPUT_PREFIX>.fastq
@@ -139,56 +116,12 @@ This is the original input bam file and index created by periscope with the read
 - XO is the orf assigned
 
 These are useful for manual review in IGV or similar genome viewer. You can sort or colour reads by these tags to aid in manual review and figure creation.
+ -->
 
 
-# Extracting Base Frequencies
-
-To examine the composition of bases at variant sites we have provided this code.
-```
-conda activate periscope
-
-gunzip <ARTIC_NETWORK_VCF>.pass.vcf.gz
-
-<PATH_TO_PERISCOPE>/periscope/periscope/scripts/variant_expression.py \
-    --periscope-bam <PATH_TO_PERISCOPE_OUTPUT_BAM> \
-    --vcf <ARTIC_NETWORK_VCF>.pass.vcf \
-    --sample <SAMPLE_NAME> \
-    --output-prefix <PREFIX>
-```
-
-#### <OUTPUT_PREFIX>_base_counts.csv
-
-Counts of each base at each position
-
-#### <OUTPUT_PREFIX>_base_counts.png
-
-Plot of each position and base composition
-
-# Running Tests
-
-We provide a sam file for testing the main module of periscope.
-
-reads.sam contains 23 reads which have been manually reviewed for the truth
-
-```
-cd <INSTALLATION_PATH>/periscope/tests
-
-pytest test_search_for_sgRNA.py 
-```
-
+<!-- 
 # Citations
 
-### Long Amplicon Tiling Data
-
-We implemened 2kb amplicon tilling in v0.0.2 from:
-
-**SARS-CoV-2 genomes recovered by long amplicon tiling multiplex approach using nanopore sequencing and applicable to other sequencing platforms**
-Paola Cristina Resende, Fernando Couto Motta, Sunando Roy, Luciana Appolinario, Allison Fabri, Joilson Xavier, Kathryn Harris, Aline Rocha Matos, Braulia Caetano, Maria Orgeswalska, Milene Miranda, Cristiana Garcia, André Abreu, Rachel Williams, Judith Breuer, Marilda M Siqueira
-bioRxiv 2020.04.30.069039; doi: https://doi.org/10.1101/2020.04.30.069039
-
-
-
-
-
-
-Why periscope? SUB-genomic RNA, SUB-marine, periscope.
+**Title**
+Authors. Journal; doi;
+ -->

@@ -4,13 +4,11 @@
 
 A tool to subsample genomic data guided by epidemiological time series data.
 
-<!-- 
 # Citing
 
-Please cite our pre-print if you use this tool in any publications:
+if you use this tool in a publication, please cite our preprint:
 
-https://www.biorxiv.org/content/10.1101/2020.07.01.181867v1
- -->
+https://www.medrxiv.org/content/10.1101/2021.02.10.21251540v2
 
 # Requirements
 `subsampler` runs on MacOS and Linux.

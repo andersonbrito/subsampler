@@ -6,7 +6,7 @@ A tool to subsample genomic data guided by epidemiological time series data.
 
 # Citing
 
-if you use this tool in a publication, please cite our preprint:
+If you use this tool in a publication, please cite our preprint:
 
 https://www.medrxiv.org/content/10.1101/2021.02.10.21251540v2
 
@@ -15,10 +15,10 @@ https://www.medrxiv.org/content/10.1101/2021.02.10.21251540v2
 
 
 * conda
-* Fasta file containing the sampled genomes
-* Metadata file containing at least sample names, date, and geographic locations
+* Fasta file containing all sampled genomes
+* Metadata file containing at least sample names ("`strain`"), `date`, and geographic locations (`country`, `division`, etc).
 * Matrix of daily case counts per geographic location (as listed in the metadata)
-* Create conda environment
+
 
 # Installation
 ```
@@ -34,7 +34,6 @@ conda activate subsampler
 conda activate subsampler
 snakemake subsampler
 ```
-
 
 # Pipeline overview
 

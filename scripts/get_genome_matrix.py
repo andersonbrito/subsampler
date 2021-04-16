@@ -23,10 +23,11 @@ if __name__ == '__main__':
     geo_col = args.index_column
     extra_cols = args.extra_columns
     date_col = args.date_column
-    group_by = [geo_col, date_col]
+    group_by = ['code', date_col]
     start_date = args.start_date
     end_date = args.end_date
     output = args.output
+
 
     # path = '/Users/anderson/GLab Dropbox/Anderson Brito/projects/ncov/ncov_nyc/nextstrain/run4_20210416_nynj/'
     # metadata = path + 'data/metadata_nextstrain.tsv'
@@ -36,10 +37,10 @@ if __name__ == '__main__':
     # date_col = 'date'
     # extra_cols = ['country_exposure']
     # group_by = ['code', date_col]
-    # # start_date = '2019-12-01'
-    # # end_date = '2020-02-15'
-    # start_date = None
-    # end_date = None
+    # start_date = '2019-12-01'
+    # end_date = '2020-07-15'
+    # # start_date = None
+    # # end_date = None
 
 
     pd.set_option('display.max_columns', 500)
@@ -139,8 +140,10 @@ if __name__ == '__main__':
         df.insert(1, 'code', '')
         if 'division' in geo_col:
             df['code'] = df[geo_col].apply(lambda x: us_state_abbrev[x] if x in us_state_abbrev else '')
-        if 'country' in geo_col:
+        elif 'country' in geo_col:
             df['code'] = df[geo_col].apply(lambda x: get_iso(x))
+        else:
+            df['code'] = df[geo_col]
 
 
     # remove genomes with incomplete dates

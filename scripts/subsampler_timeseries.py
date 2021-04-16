@@ -327,7 +327,8 @@ if __name__ == '__main__':
             dfF = dfF.append(chunk, ignore_index=True)
     else:
         dfF = dfM
-
+    
+    print('\n### Removing genomes from categories listed in batch_removal.tsv...\n')
     # drop rows with unwanted samples
     drop_lines = open(drop_file).readlines()
     if len(drop_lines) > 0:

@@ -66,7 +66,7 @@ if __name__ == '__main__':
     date_columns = [column for column in df.columns.to_list() if column[0].isdecimal()]
     df = df[['Country/Region', 'Province/State'] + date_columns]
     df.fillna('', inplace=True)
-    df.insert(2, 'iso', '')
+    df.insert(2, 'code', '')
 
 
     # drop unwanted rows
@@ -114,7 +114,7 @@ if __name__ == '__main__':
 
 
     # add iso code
-    df['iso'] = df['Country/Region'].map(get_iso)
+    df['code'] = df['Country/Region'].map(get_iso)
 
     # country dependencies
     has_dependencies = ['United Kingdom', 'France', 'Denmark', 'Netherlands']
@@ -122,10 +122,10 @@ if __name__ == '__main__':
     for idx, row in df.iterrows():
         country = df.loc[idx, 'Country/Region']
         province = df.loc[idx, 'Province/State']
-        iso = df.loc[idx, 'iso']
+        iso = df.loc[idx, 'code']
         if province in is_autonomous:
             df.loc[idx, 'Country/Region'] = province
-            df.loc[idx, 'iso'] = get_iso(province)
+            df.loc[idx, 'code'] = get_iso(province)
 
         if province not in '' and country in has_dependencies:
             # print(country, province)
@@ -133,7 +133,7 @@ if __name__ == '__main__':
                 continue
             else:
                 df.loc[idx, 'Country/Region'] = province
-                df.loc[idx, 'iso'] = get_iso(province)
+                df.loc[idx, 'code'] = get_iso(province)
 
 
     df = df.drop(columns=['Province/State']) # drop unwanted columns
@@ -141,7 +141,7 @@ if __name__ == '__main__':
 
 
     # group by country name, summing up values
-    df = df.groupby(['iso', 'country'], as_index=False).sum()
+    df = df.groupby(['code', 'country'], as_index=False).sum()
 
 
     date_columns = [column for column in df.columns.to_list() if column[0].isdecimal()][::-1]
@@ -155,7 +155,7 @@ if __name__ == '__main__':
         if num < len(date_columns)-1:
             # print(num, len(date_columns), date_columns[len(date_columns)-1])
             for idx, row_value in df[col].iteritems():
-                country = df.loc[idx, 'iso']
+                country = df.loc[idx, 'code']
                 daily_count = int(row_value) - int(df[date_columns[num+1]][idx])
                 if daily_count < 0:
                     daily_count = 0

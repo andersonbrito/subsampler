@@ -199,29 +199,24 @@ if __name__ == '__main__':
             if dfM.loc[idx, exposure_column].lower() in ['', 'unknown']:
                 dfM.loc[idx, exposure_column] = dfM.loc[idx, level]
 
+
     # get ISO alpha3 country codes
-    isos = {}
+    codes = {'Rest of the US': 'RES', 'NewYork/NewJersey': 'NYJ'}
     def get_iso(country):
-        global isos
-        if country not in isos.keys():
+        global codes
+        if country not in codes.keys():
             try:
                 isoCode = pyCountry.country_name_to_country_alpha3(country, cn_name_format="default")
-                isos[country] = isoCode
+                codes[country] = isoCode
             except:
                 try:
                     isoCode = pycountry.countries.search_fuzzy(country)[0].alpha_3
-                    isos[country] = isoCode
+                    codes[country] = isoCode
                 except:
-                    isos[country] = ''
-        return isos[country]
+                    codes[country] = ''
+        return codes[country]
 
 
-    # add country iso code
-    if 'iso' not in dfM.columns.to_list():
-        dfM.insert(1, 'iso', '')
-        dfM['iso'] = dfM['country_exposure'].apply(lambda x: get_iso(x))
-
-    # add state code
     us_state_abbrev = {
         'Alabama': 'AL',
         'Alaska': 'AK',
@@ -281,9 +276,17 @@ if __name__ == '__main__':
         'Wisconsin': 'WI',
         'Wyoming': 'WY'
     }
+
+    # add state code
     if 'code' not in dfM.columns.to_list():
         dfM.insert(1, 'code', '')
-        dfM['code'] = dfM['division_exposure'].apply(lambda x: us_state_abbrev[x] if x in us_state_abbrev else '')
+        if 'division' in geo_level:
+            dfM['code'] = dfM[geo_level].apply(lambda x: us_state_abbrev[x] if x in us_state_abbrev else '')
+        elif 'country' in geo_level:
+            dfM['code'] = dfM[geo_level].apply(lambda x: get_iso(x))
+        else:
+            dfM['code'] = dfM[geo_level]
+
 
     # empty matrix dataframe
     columns = sorted(dfM['epiweek'].unique().tolist())

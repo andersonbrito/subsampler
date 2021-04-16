@@ -15,23 +15,24 @@ if __name__ == '__main__':
     parser.add_argument("--sequences", required=True, help="FASTA file with genomes named as in metadata")
     parser.add_argument("--metadata", required=True, help="Metadata TSV file")
     parser.add_argument("--genome-matrix", required=True, help="TSV file showing corrected genome counts per epiweek")
-    parser.add_argument("--max-missing", required=True, type=int,  help="Maximum percentage of Ns or gaps (int = 1-100)")
-    parser.add_argument("--refgenome-size", required=True, type=int,  help="Reference genome size")
+    parser.add_argument("--max-missing", required=True, type=int, help="Maximum percentage of Ns or gaps (int = 1-100)")
+    parser.add_argument("--refgenome-size", required=True, type=int, help="Reference genome size")
     parser.add_argument("--keep", required=False, help="List of samples to keep, in all instances")
     parser.add_argument("--remove", required=False, help="List of samples to remove, in all instances")
     parser.add_argument("--drop_list", required=False, help="TSV file listing columns/values of samples to be dropped")
-    parser.add_argument("--include_list", required=False, help="TSV file listing columns/values of samples to be dropped")
-    parser.add_argument("--seed", required=False, type=int,  help="Seed number for pseudorandom sampling of genomes")
+    parser.add_argument("--include_list", required=False,
+                        help="TSV file listing columns/values of samples to be dropped")
+    parser.add_argument("--seed", required=False, type=int, help="Seed number for pseudorandom sampling of genomes")
     parser.add_argument("--index-column", required=True, help="Metadata column with unique geographic information")
-    parser.add_argument("--date-column", required=True, type=str,  help="Metadata column containing the collection dates")
-    parser.add_argument("--filter-column", required=False, type=str,  help="Column with dates used to filter by date")
-    parser.add_argument("--start-date", required=False, type=str,  help="Start date in YYYY-MM-DD format")
-    parser.add_argument("--end-date", required=False, type=str,  help="End date in YYYY-MM-DD format")
+    parser.add_argument("--date-column", required=True, type=str,
+                        help="Metadata column containing the collection dates")
+    parser.add_argument("--filter-column", required=False, type=str, help="Column with dates used to filter by date")
+    parser.add_argument("--start-date", required=False, type=str, help="Start date in YYYY-MM-DD format")
+    parser.add_argument("--end-date", required=False, type=str, help="End date in YYYY-MM-DD format")
     parser.add_argument("--sampled-sequences", required=True, help="Sampled genomes")
     parser.add_argument("--sampled-metadata", required=True, help="Sampled metadata")
     parser.add_argument("--report", required=True, help="List of statistics related to the sampling scheme")
     args = parser.parse_args()
-
 
     input1 = args.sequences
     input2 = args.metadata
@@ -52,20 +53,21 @@ if __name__ == '__main__':
     output2 = args.sampled_metadata
     output3 = args.report
 
-
-    # path = '/Users/anderson/GLab Dropbox/Anderson Brito/projects/ncov_bubble/nextstrain/run12_20201008_batch15/sampling_prop/'
+    # path = '/Users/anderson/GLab Dropbox/Anderson Brito/projects/ncov/ncov_nyc/nextstrain/run3_20210415_subsample/'
     # input1 = path + 'data/gisaid_hcov-19.fasta'
     # input2 = path + 'data/metadata_nextstrain.tsv'
     # input3 = path + 'outputs/matrix_genomes_epiweeks_corrected.tsv'
     # keep = path + 'config/keep.txt'
+    # include_file = path + 'config/strict_inclusion.tsv'
+    # drop_file = path + 'config/batch_removal.tsv'
     # remove = path + 'config/remove.txt'
     # geo_level = 'iso'
     # seed = 2007
     # # seed = None
     # date_col = 'date'
     # filter_col = 'date'
-    # genome_size = 29420
-    # max_gaps = 5
+    # genome_size = 29930
+    # max_gaps = 30
     # start_date = '2019-12-15'
     # end_date = '2020-09-30'
     # # start_date = None
@@ -73,7 +75,6 @@ if __name__ == '__main__':
     # output1 = path + 'sequences_corrected0001.fasta'
     # output2 = path + 'metadata_corrected0001.tsv'
     # output3 = path + 'report.txt'
-
 
     if seed == None:
         seed = random.random()
@@ -94,13 +95,14 @@ if __name__ == '__main__':
         id, seq = fasta.description, str(fasta.seq)
         id = id.replace('hCoV-19/', '').split('|')[0].replace(' ', '')
         size = len(seq.replace('N', '').replace('-', ''))
-        min_size = genome_size - int(genome_size * max_gaps/100)
+        min_size = genome_size - int(genome_size * max_gaps / 100)
         if size > min_size:
             # print(size, min_size)
             # print(id)
             fasta_headers.append(id)
         else:
-            print('size: ' + str(size) + ' bp ' + ' - ' + id + ' contains more than ' + str(max_gaps) + '% of Ns. Skipping...')
+            print('size: ' + str(size) + ' bp ' + ' - ' + id + ' contains more than ' + str(
+                max_gaps) + '% of Ns. Skipping...')
 
     print('\n### Loading matrices...')
     # open metadata file
@@ -111,14 +113,14 @@ if __name__ == '__main__':
     # open genome sampling matrix
     dfS = pd.read_csv(input3, encoding='utf-8', sep=separator, dtype=str)
 
+    print('\t- Removing genomes with incomplete dates')
     # remove genomes with incomplete dates
     dfM = dfM[dfM[date_col].apply(lambda x: len(x.split('-')) == 3)]  # accept only full dates
     dfM = dfM[dfM[date_col].apply(lambda x: 'X' not in x)]  # exclude -XX-XX missing dates
 
-
     # filter by date
     today = time.strftime('%Y-%m-%d', time.gmtime())
-    dfM[filter_col] = pd.to_datetime(dfM[filter_col]) # converting to datetime format
+    dfM[filter_col] = pd.to_datetime(dfM[filter_col])  # converting to datetime format
     if start_date == None:
         start_date = dfM[filter_col].min()
     if end_date == None:
@@ -127,18 +129,23 @@ if __name__ == '__main__':
     dfM[filter_col] = dfM[filter_col].apply(lambda x: x.strftime('%Y-%m-%d'))
     # print(dfM)
 
+    print('\t- Filtering genomes by date')
+
 
     # filter genomes based on sampling date
     def filter_bydate(df, date):
-        df[date] = pd.to_datetime(df[date]) # converting to datetime format
+        df[date] = pd.to_datetime(df[date])  # converting to datetime format
         # print(df[date])
-        mask = (df[date] > start_date) & (df[date] <= end_date) # mask any lines with dates outside the start/end dates
-        df = df.loc[mask] # apply mask
+        mask = (df[date] > start_date) & (df[date] <= end_date)  # mask any lines with dates outside the start/end dates
+        df = df.loc[mask]  # apply mask
         # print(df[date])
         return df
+
+
     dfM = filter_bydate(dfM, filter_col)
     # print(dfM)
 
+    print('\t- Removing genomes tagged for removal')
     # list of sequences to be ignored in all instances
     remove_sequences = []
     for id in open(remove, "r").readlines():
@@ -146,16 +153,16 @@ if __name__ == '__main__':
             id = id.strip()
             remove_sequences.append(id)
 
+    print('\t- Checking if genomes have metadata, and removing if negative')
     # check if available sequences have metadata
     meta_seqs = dfM['strain'].to_list()
-    intersection = [] # sequences that also have metadata
-    for strain in fasta_headers:
-        if strain in meta_seqs:
-            intersection.append(strain)
-        else:
-            remove_sequences.append(strain)
+    intersection = set(fasta_headers).intersection(meta_seqs)
+    def Diff(li1, li2):
+        return (list(list(set(li1) - set(li2)) + list(set(li2) - set(li1))))
 
+    remove_sequences = remove_sequences + Diff(intersection, meta_seqs)
 
+    print('\t- Adding genomes to be kept in all instances')
     # list of sequences to be kept in all instances
     keep_sequences = []
     for id in open(keep, "r").readlines():
@@ -167,8 +174,8 @@ if __name__ == '__main__':
                 remove_sequences.append(id)
 
     # keep or remove specific sequences
-    dfM = dfM[dfM['strain'].isin(intersection)] # include only sequences with metadata
-    dfM = dfM[~dfM['strain'].isin(remove_sequences)] # remove bad quality sequences
+    dfM = dfM[dfM['strain'].isin(intersection)]  # include only sequences with metadata
+    dfM = dfM[~dfM['strain'].isin(remove_sequences)]  # remove bad quality sequences
 
 
     ### FIX OR ADD NEW COLUMNS IN THE METADATA
@@ -176,9 +183,11 @@ if __name__ == '__main__':
     # create epiweek column
     def get_epiweeks(date):
         date = pd.to_datetime(date)
-        epiweek = str(Week.fromdate(date, system="cdc")) # get epiweeks
+        epiweek = str(Week.fromdate(date, system="cdc"))  # get epiweeks
         epiweek = epiweek[:4] + '_' + 'EW' + epiweek[-2:]
         return epiweek
+
+
     dfM['epiweek'] = dfM[date_col].apply(lambda x: get_epiweeks(x))
     # print(dfM)
 
@@ -276,7 +285,6 @@ if __name__ == '__main__':
         dfM.insert(1, 'code', '')
         dfM['code'] = dfM['division_exposure'].apply(lambda x: us_state_abbrev[x] if x in us_state_abbrev else '')
 
-
     # empty matrix dataframe
     columns = sorted(dfM['epiweek'].unique().tolist())
     rows = sorted(dfM[geo_level].astype(str).unique().tolist())
@@ -303,7 +311,7 @@ if __name__ == '__main__':
     # print(dfG)
     # print(seed)
 
-
+    print('\t- Dropping unwanted sample categories')
     dfF = pd.DataFrame(columns=dfM.columns.to_list())
 
     # include only entries matching certain categories
@@ -323,26 +331,25 @@ if __name__ == '__main__':
         for line in drop_lines:
             column, value = line.strip().split('\t')
             print('Batch removal: column=' + column + '; value=' + value)
-            dfF = dfF[~dfF[column].isin([value])] # batch drop specific samples
-
+            dfF = dfF[~dfF[column].isin([value])]  # batch drop specific samples
 
     print('\n### Starting sampling process...\n')
     # sampling process
-    random.seed(seed) # pseudo-random sampling seed
+    random.seed(seed)  # pseudo-random sampling seed
     glevel = dfF.groupby(geo_level)
     for name, dfLevel in glevel:
         if name in dfS[geo_level].to_list():
-            gEpiweek = dfLevel.groupby('epiweek') # geolevel-specific dataframe
+            gEpiweek = dfLevel.groupby('epiweek')  # geolevel-specific dataframe
             for epiweek, dfEpiweek in gEpiweek:
                 available_samples = dfEpiweek['epiweek'].count()  # genomes in bin
                 try:
                     target_sampling = int(dfS.loc[dfS[geo_level] == name, epiweek])
                 except:
-                    target_sampling = 1 # available_samples # take this number of genomes when not epidata is available
+                    target_sampling = 1  # available_samples # take this number of genomes when not epidata is available
                 # print('')
                 # print(name, epiweek, '-', available_samples, target_sampling, bias)
 
-                existing = dfG.loc[name, epiweek] # pre-selected sequences
+                existing = dfG.loc[name, epiweek]  # pre-selected sequences
 
                 if target_sampling >= available_samples:  # if requested sample number is higher than available genomes, get all
                     sampled = [sample for sample in dfEpiweek['strain'].to_list() if sample not in existing]
@@ -356,8 +363,7 @@ if __name__ == '__main__':
                         target_sampling = len(existing)
                     sampled = random.sample(pool, target_sampling - len(existing))
 
-                dfG.at[name, epiweek] += sampled # add selected samples to dataframe
-
+                dfG.at[name, epiweek] += sampled  # add selected samples to dataframe
 
     # export output
     selected_samples = []
@@ -406,17 +412,19 @@ if __name__ == '__main__':
     dfM = dfM.sort_values(by=geo_level)
     dfM.to_csv(output2, sep='\t', index=False)
 
-
     # export report
     outfile3 = open(output3, 'w')
     outfile3.write('# Seed for pseudo-random sampling: ' + str(seed) + '\n\n')
-    outfile3.write('# A total of ' + str(total_genomes) + ' sequences selected from ' + str(len(report)) + ' locations\n\n')
+    outfile3.write(
+        '# A total of ' + str(total_genomes) + ' sequences selected from ' + str(len(report)) + ' locations\n\n')
     for loc, count in report.items():
         outfile3.write(str(count) + '\t' + loc + '\n')
-    outfile3.write('\n\n# A total of ' + str(len(remove_sequences)) + ' were removed due to lack of metadata, or as listed in remove.txt\n\n')
+    outfile3.write('\n\n# A total of ' + str(
+        len(remove_sequences)) + ' were removed due to lack of metadata, or as listed in remove.txt\n\n')
     for sample in remove_sequences:
         outfile3.write(sample + '\n')
-    outfile3.write('\n\n# A total of ' + str(len(keep_sequences)) + ' samples were forcibly added as listed in keep.txt\n\n')
+    outfile3.write(
+        '\n\n# A total of ' + str(len(keep_sequences)) + ' samples were forcibly added as listed in keep.txt\n\n')
     for sample in keep_sequences:
         outfile3.write(sample + '\n')
 

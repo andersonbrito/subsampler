@@ -28,14 +28,14 @@ if __name__ == '__main__':
     end_date = args.end_date
     output = args.output
 
-    # path = '/Users/anderson/GLab Dropbox/Anderson Brito/projects/ncov_bubble/nextstrain/run12_20201008_batch15/sampling_prop/'
+    # path = '/Users/anderson/GLab Dropbox/Anderson Brito/projects/ncov/ncov_nyc/nextstrain/run4_20210416_nynj/'
     # metadata = path + 'data/metadata_nextstrain.tsv'
     # output = path + 'matrix_genomes_daily.tsv'
     #
-    # geo_col = 'code'
+    # geo_col = 'country_exposure'
     # date_col = 'date'
-    # extra_cols = ['region_exposure', 'country_exposure']
-    # group_by = [geo_col, date_col]
+    # extra_cols = ['country_exposure']
+    # group_by = ['code', date_col]
     # # start_date = '2019-12-01'
     # # end_date = '2020-02-15'
     # start_date = None
@@ -57,20 +57,20 @@ if __name__ == '__main__':
                 df.loc[idx, exposure_column] = df.loc[idx, level]
 
     # get ISO alpha3 country codes
-    isos = {}
+    codes = {'Rest of the US': 'RES', 'NewYork/NewJersey': 'NYJ'}
     def get_iso(country):
-        global isos
-        if country not in isos.keys():
+        global codes
+        if country not in codes.keys():
             try:
                 isoCode = pyCountry.country_name_to_country_alpha3(country, cn_name_format="default")
-                isos[country] = isoCode
+                codes[country] = isoCode
             except:
                 try:
                     isoCode = pycountry.countries.search_fuzzy(country)[0].alpha_3
-                    isos[country] = isoCode
+                    codes[country] = isoCode
                 except:
-                    isos[country] = ''
-        return isos[country]
+                    codes[country] = ''
+        return codes[country]
 
 
     us_state_abbrev = {
@@ -132,16 +132,15 @@ if __name__ == '__main__':
         'Wisconsin': 'WI',
         'Wyoming': 'WY'
     }
+    
+    
     # add state code
     if 'code' not in df.columns.to_list():
         df.insert(1, 'code', '')
-        df['code'] = df['division_exposure'].apply(lambda x: us_state_abbrev[x] if x in us_state_abbrev else '')
-
-
-    # add country iso code
-    if 'iso' not in df.columns.to_list():
-        df.insert(1, 'iso', '')
-        df['iso'] = df['country_exposure'].apply(lambda x: get_iso(x))
+        if 'division' in geo_col:
+            df['code'] = df[geo_col].apply(lambda x: us_state_abbrev[x] if x in us_state_abbrev else '')
+        if 'country' in geo_col:
+            df['code'] = df[geo_col].apply(lambda x: get_iso(x))
 
 
     # remove genomes with incomplete dates
@@ -159,7 +158,6 @@ if __name__ == '__main__':
     # # remove genomes with incomplete dates
     # df[date_col] = df[date_col].apply(lambda x: x.strftime('%Y-%m-%d'))
 
-
     mask = (df[date_col] >= start_date) & (df[date_col] <= end_date) # mask any lines with dates outside the start/end dates
     df = df.loc[mask] # apply mask
 
@@ -173,7 +171,7 @@ if __name__ == '__main__':
     df[date_col] = df[date_col].apply(lambda x: x.strftime('%Y-%m-%d'))
 
     # filter out genomes with missing 'geo_level' name
-    df = df[df[geo_col].apply(lambda x: len(str(x)) > 0)]
+    df = df[df['code'].apply(lambda x: len(str(x)) > 0)]
 
 
     # filter out genomes with incomplete dates
@@ -187,13 +185,13 @@ if __name__ == '__main__':
     # print(df2)
 
     columns = sorted(df[date_col].unique().tolist())
-    rows = sorted(df[geo_col].unique().tolist())
+    rows = sorted(df['code'].unique().tolist())
 
     # empty matrix dataframe
     df3 = pd.DataFrame(index=rows, columns=columns)
     df3 = df3.fillna(0) # with 0s rather than NaNs
     # give index a name
-    df3.index.name = geo_col
+    df3.index.name = 'code'
     # print(df3)
 
 
@@ -204,7 +202,7 @@ if __name__ == '__main__':
     for column in extra_cols:
         if column in df.columns.to_list():
             df3.insert(0, column, '')
-    df.set_index(geo_col, inplace=True)
+    df.set_index('code', inplace=True)
 
     # fill extra columns with their original content
     for idx, row in df3.iterrows():
@@ -212,13 +210,12 @@ if __name__ == '__main__':
             if column in df.columns.to_list():
                 # value = df.loc[idx, column][0]
                 value = df.loc[df.index == idx][column].values[0]
-                # print(value)
                 df3.at[idx, column] = value
 
     # fill matrix with genome counts
     found = []
     for idx, row in df2.iterrows():
-        geo = df2.loc[idx, geo_col]
+        geo = df2.loc[idx, 'code']
         time = df2.loc[idx, date_col]
         count = df2.loc[idx, 'genome_count']
         df3.at[geo, time] = count

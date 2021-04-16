@@ -7,7 +7,7 @@ rule arguments:
 		remove_file = "config/remove.txt",
 		include_file = "config/strict_inclusion.tsv",
 		drop_file = "config/batch_removal.tsv",
-		index_column = "code",
+		index_column = "division_exposure",
 		date_column = "date",
 		baseline = "0.0001",
 		refgenome_size = "29930",
@@ -29,7 +29,7 @@ rule genome_matrix:
 		metadata = arguments.metadata
 	params:
 		index = arguments.index_column,
-		extra_columns = "division_exposure",
+		extra_columns = "country_exposure",
 		date = arguments.date_column
 	output:
 		matrix = "outputs/genome_matrix_days.tsv"
@@ -62,6 +62,7 @@ rule epiweek_conversion:
 		python3 scripts/convertDays2Epiweek.py \
 			--input {input.genome_matrix} \
 			--output {output.output1}
+
 		python3 scripts/convertDays2Epiweek.py \
 			--input {input.case_matrix} \
 			--start-date {params.start_date} \

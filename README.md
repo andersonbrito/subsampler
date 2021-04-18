@@ -6,9 +6,9 @@ A tool to subsample genomic data guided by epidemiological time series data.
 
 # Citing
 
-If you use this tool in a publication, please cite our preprint:
+If you use this tool in a publication, please cite our paper:
 
-https://www.medrxiv.org/content/10.1101/2021.02.10.21251540v2
+[Early introductions and transmission of SARS-CoV-2 variant B.1.1.7 in the United States](https://www.sciencedirect.com/science/article/pii/S0092867421004347)
 
 # Requirements
 `subsampler` runs on MacOS and Linux.

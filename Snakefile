@@ -14,7 +14,7 @@ rule arguments:
 		max_missing = "30",
 		seed_num = "2007",
 		start_date = "2019-12-15",
-		end_date = "2021-04-15"
+		end_date = "2021-04-22"
 
 
 arguments = rules.arguments.params
@@ -79,7 +79,7 @@ rule correct_bias:
 		genome_matrix = "outputs/matrix_genomes_epiweeks.tsv",
 		case_matrix = "outputs/matrix_cases_epiweeks.tsv"
 	params:
-		index = arguments.index_column,
+		index = 'code',
 		baseline = arguments.baseline
 	output:
 		output1 = "outputs/weekly_sampling_proportions.tsv",

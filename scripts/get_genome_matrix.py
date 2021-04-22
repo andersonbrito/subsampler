@@ -11,13 +11,13 @@ if __name__ == '__main__':
     )
     parser.add_argument("--metadata", required=True, help="Metadata TSV file")
     parser.add_argument("--index-column", required=True, help="Column with unique geographic information")
-    parser.add_argument("--extra-columns", required=False, nargs='+', type=str,  help="extra columns with geographic info to export")
-    parser.add_argument("--date-column", required=True, type=str,  help="Column containing the date information")
-    parser.add_argument("--start-date", required=False, type=str,  help="Start date in YYYY-MM-DD format")
-    parser.add_argument("--end-date", required=False, type=str,  help="End date in YYYY-MM-DD format")
+    parser.add_argument("--extra-columns", required=False, nargs='+', type=str,
+                        help="extra columns with geographic info to export")
+    parser.add_argument("--date-column", required=True, type=str, help="Column containing the date information")
+    parser.add_argument("--start-date", required=False, type=str, help="Start date in YYYY-MM-DD format")
+    parser.add_argument("--end-date", required=False, type=str, help="End date in YYYY-MM-DD format")
     parser.add_argument("--output", required=True, help="Genome matrix")
     args = parser.parse_args()
-
 
     metadata = args.metadata
     geo_col = args.index_column
@@ -28,20 +28,18 @@ if __name__ == '__main__':
     end_date = args.end_date
     output = args.output
 
-
-    # path = '/Users/anderson/GLab Dropbox/Anderson Brito/projects/ncov/ncov_nyc/nextstrain/run4_20210416_nynj/'
+    # path = '/Users/anderson/GLab Dropbox/Anderson Brito/projects/ncov/ncov_variants/nextstrain/run15_20210422_samprop/'
     # metadata = path + 'data/metadata_nextstrain.tsv'
     # output = path + 'matrix_genomes_daily.tsv'
-    #
-    # geo_col = 'country_exposure'
+
+    # geo_col = 'division_exposure'
     # date_col = 'date'
     # extra_cols = ['country_exposure']
     # group_by = ['code', date_col]
     # start_date = '2019-12-01'
-    # end_date = '2020-07-15'
-    # # start_date = None
-    # # end_date = None
-
+    # end_date = '2020-07-22'
+    # start_date = None
+    # end_date = None
 
     pd.set_option('display.max_columns', 500)
 
@@ -51,11 +49,13 @@ if __name__ == '__main__':
 
     # fix exposure
     geolevels = ['region', 'country', 'division']
+    print('\n * Loading genome metadata\n')
     for level in geolevels:
         exposure_column = level + '_exposure'
-        for idx, row in df.iterrows():
-            if df.loc[idx, exposure_column].lower() in ['', 'unknown']:
-                df.loc[idx, exposure_column] = df.loc[idx, level]
+        if exposure_column == geo_col:
+            for idx, row in df.iterrows():
+                if df.loc[idx, exposure_column].lower() in ['', 'unknown']:
+                    df.loc[idx, exposure_column] = df.loc[idx, level]
 
     # get ISO alpha3 country codes
     codes = {'Rest of the US': 'RES', 'NewYork/NewJersey': 'NYJ'}
@@ -133,9 +133,9 @@ if __name__ == '__main__':
         'Wisconsin': 'WI',
         'Wyoming': 'WY'
     }
-    
-    
+
     # add state code
+    print('\n * Converting ' + geo_col + ' into codes (acronyms)\n')
     if 'code' not in df.columns.to_list():
         df.insert(1, 'code', '')
         if 'division' in geo_col:
@@ -145,42 +145,35 @@ if __name__ == '__main__':
         else:
             df['code'] = df[geo_col]
 
-
     # remove genomes with incomplete dates
+    print('\n * Removing genomes with incomplete dates\n')
     df = df[df[date_col].apply(lambda x: len(x.split('-')) == 3)]  # accept only full dates
     df = df[df[date_col].apply(lambda x: 'X' not in x)]  # exclude -XX-XX missing dates
 
     # filter by date
+    print('\n * Filtering genomes by start and end dates\n')
     today = time.strftime('%Y-%m-%d', time.gmtime())
-    df[date_col] = pd.to_datetime(df[date_col]) # converting to datetime format
+    df[date_col] = pd.to_datetime(df[date_col])  # converting to datetime format
     if start_date == None:
         start_date = df[date_col].min()
     if end_date == None:
         end_date = today
 
-    # # remove genomes with incomplete dates
-    # df[date_col] = df[date_col].apply(lambda x: x.strftime('%Y-%m-%d'))
-
-    mask = (df[date_col] >= start_date) & (df[date_col] <= end_date) # mask any lines with dates outside the start/end dates
-    df = df.loc[mask] # apply mask
-
-    # report
-    print('\n### Available genomes\n')
-    print('Oldest collected sampled = ' + df[date_col].min().strftime('%Y-%m-%d'))
-    print('Newest collected sampled = ' + df[date_col].max().strftime('%Y-%m-%d'))
-    print('')
-
-    # convert back to string format
-    df[date_col] = df[date_col].apply(lambda x: x.strftime('%Y-%m-%d'))
+    mask = (df[date_col] >= start_date) & (
+                df[date_col] <= end_date)  # mask any lines with dates outside the start/end dates
+    df = df.loc[mask]  # apply mask
 
     # filter out genomes with missing 'geo_level' name
     df = df[df['code'].apply(lambda x: len(str(x)) > 0)]
 
+    # report
+    print('\n* Available genomes\n')
+    print('\tOldest collected sampled = ' + df[date_col].min().strftime('%Y-%m-%d'))
+    print('\tNewest collected sampled = ' + df[date_col].max().strftime('%Y-%m-%d'))
+    print('')
 
-    # filter out genomes with incomplete dates
-    # df = df[df[date_col].apply(lambda x: len(x.split('-')) == 3)]  # accept only full dates
-    # df = df[df[date_col].apply(lambda x: 'X' not in x)]  # exclude -XX-XX missing dates
-    # print(df)
+    # convert back to string format
+    df[date_col] = df[date_col].apply(lambda x: x.strftime('%Y-%m-%d'))
 
 
     # group lines based on date and geolocation, and return genome counts
@@ -192,11 +185,11 @@ if __name__ == '__main__':
 
     # empty matrix dataframe
     df3 = pd.DataFrame(index=rows, columns=columns)
-    df3 = df3.fillna(0) # with 0s rather than NaNs
+    df3 = df3.fillna(0)  # with 0s rather than NaNs
+
     # give index a name
     df3.index.name = 'code'
     # print(df3)
-
 
     # add other columns, if available
     if extra_cols == None:
@@ -216,13 +209,13 @@ if __name__ == '__main__':
                 df3.at[idx, column] = value
 
     # fill matrix with genome counts
+    print('\n * Exporting matrix of daily genome counts\n')
     found = []
     for idx, row in df2.iterrows():
         geo = df2.loc[idx, 'code']
         time = df2.loc[idx, date_col]
         count = df2.loc[idx, 'genome_count']
         df3.at[geo, time] = count
-
 
     # output processed dataframe
     df3.to_csv(output, sep='\t', index=True)

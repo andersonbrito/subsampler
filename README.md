@@ -32,7 +32,7 @@ conda activate subsampler
 
 ```
 conda activate subsampler
-snakemake subsampler
+snakemake subsample
 ```
 
 # Pipeline overview

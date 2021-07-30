@@ -73,13 +73,7 @@ _`subsampler` can perform subsampling using epidemiological data from any geogra
 * Generate report with number of sampled genomes per location
 
 
-
 # Execution
-
-```
-conda activate subsampler
-snakemake subsample
-```
 
 To run this pipeline, users need to provide a TSV file of daily case counts similar to the format below:
 
@@ -146,6 +140,7 @@ The `subsampler` pipeline allows users to calculate the percentage of sequenced 
 To that end, the user needs to provide a metadata matrix, similar to the one used by [nextstrain](nextstrain.org), which can be downloaded from [GISAID](gisaid.org), under `Downloads > Genomic Epidemiology`. Rename such file as `metadata_nextstrain.tsv`, place it inside `/data`, and the pipeline only half-way through, by using the command:
 
 ```
+conda activate subsampler
 snakemake correct_bias
 ```
 
@@ -155,5 +150,12 @@ After a few minutes, among the files in `/outputs`, users will find three matric
 matrix_cases_epiweeks.tsv
 matrix_genomes_epiweeks.tsv
 weekly_sampling_proportions.tsv
+```
+
+To run the full pipeline, and obtain the list of genomes sampled based on COVID-19 case counts, the last step of the pipeline need to be executed:
+
+
+```
+snakemake subsample
 ```
 

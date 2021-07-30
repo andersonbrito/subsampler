@@ -152,6 +152,8 @@ matrix_genomes_epiweeks.tsv
 weekly_sampling_proportions.tsv
 ```
 
+## Obtaining a list of genomes, sampled based on time series of COVID-19 cases
+
 To run the full pipeline, and obtain the list of genomes sampled based on COVID-19 case counts, the last step of the pipeline need to be executed:
 
 

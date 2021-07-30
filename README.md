@@ -35,6 +35,81 @@ conda activate subsampler
 snakemake subsample
 ```
 
+To run this pipeline, ones needs to provide a TSV file of daily case counts similar to the format below:
+
+**US case counts**
+
+|code|state         |2021-01-01|2021-01-02|2021-01-03|2021-01-04|2021-01-05|...|
+|----|--------------|----------|----------|----------|----------|----------|---|
+|AK  |Alaska        |5         |802       |297       |264       |200       |...|
+|AL  |Alabama       |4521      |3711      |2476      |2161      |5498      |...|
+|AR  |Arkansas      |4304      |2000      |2033      |1306      |4107      |...|
+|AS  |American Samoa|0         |0         |0         |0         |0         |...|
+|AZ  |Arizona       |10060     |8883      |17234     |5158      |5932      |...|
+|CA  |California    |39425     |50222     |37016     |38256     |38962     |...|
+|CO  |Colorado      |3064      |2011      |2078      |2185      |3458      |...|
+|CT  |Connecticut   |0         |4412      |0         |4516      |2332      |...|
+|DC  |District of Columbia|269       |257       |255       |140       |262       |...|
+|... |...           |...       |...       |...       |...       |...       |...|
+
+
+**Global case counts**
+
+|code|country       |2021-01-01|2021-01-02|2021-01-03|2021-01-04|2021-01-05|...|
+|---|--------------|----------|----------|----------|----------|----------|---|
+|ABW|Aruba         |20        |23        |32        |42        |110       |...|
+|AFG|Afghanistan   |0         |0         |0         |1485      |94        |...|
+|AGO|Angola        |15        |40        |34        |42        |72        |...|
+|AIA|Anguilla      |0         |0         |2         |0         |0         |...|
+|ALB|Albania       |0         |675       |447       |185       |660       |...|
+|AND|Andorra       |68        |49        |26        |57        |59        |...|
+|ARE|United Arab Emirates|1856      |1963      |1590      |1501      |1967      |...|
+|ARG|Argentina     |4080      |5240      |5884      |8222      |13790     |...|
+|ARM|Armenia       |329       |60        |229       |193       |324       |...|
+|...|...           |...       |...       |...       |...       |...       |...|
+
+
+You can automatically download reformatted daily case count files from [CSSE at Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19) using one of the commands below:
+
+**Global data**
+```
+python scripts/get_daily_matrix_global.py --download yes
+```
+
+**US data**
+```
+python scripts/get_daily_matrix_usa.py --download yes
+```
+
+You can provide your own daily case count file, as long as it matches the format above (tab-separated with daily counts and a column with unique identifiers). If you downloaded such file using one of the commands above, place the reformatted TSV file inside `/data`.
+
+Now, edit the Snakefile to fix the followin lines:
+
+* [index_column](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L10) = code (this should match the index column with unique identifiers)
+
+* [end_date](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L17) = "YYYY-MM-DD" (select an end date according to the case data file)
+
+* [extra_columns](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L32) = "second column with identifier" (one can select another column to be display alongside the `index_column`)
+
+## Obtaining the percentage of sequenced cases per week
+
+The `subsampler` pipeline allows users to calculate the percentage of sequenced cases in countries and US states. It aggregates both genome counts and case counts per week per location (country or state), and proceed with the division genomes/cases to get a time series of proportion of sequenced genomes, information useful for monitoring how genomic surveillance is going in different regions.
+
+To that end, the user needs to provide a metadata matrix, similar to the one used by [nextstrain](nextstrain.org), which can be downloaded from [GISAID](gisaid.org), under `Downloads > Genomic Epidemiology`. Rename such file as `metadata_nextstrain.tsv`, place it inside `/data`, and the pipeline only half-way through, by using the command:
+
+```
+snakemake correct_bias
+```
+
+After a few minutes, among the files in `/outputs`, users will find three matrices, one of them showing the weekly proportion of sequenced cases:
+
+```
+matrix_cases_epiweeks.tsv
+matrix_genomes_epiweeks.tsv
+weekly_sampling_proportions.tsv
+```
+
+
 # Pipeline overview
 
 ![alt text](https://github.com/andersonbrito/subsampler/blob/master/images/workflow.png "subsampler")

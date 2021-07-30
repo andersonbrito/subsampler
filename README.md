@@ -28,6 +28,52 @@ conda env create -f subsampler.yml
 conda activate subsampler
 ```
 
+
+# Pipeline overview
+
+![alt text](https://github.com/andersonbrito/subsampler/blob/master/images/workflow.png "subsampler")
+__Figure 1. Workflow Overview__ 
+
+
+## Creating case count matrix
+
+_`subsampler` can perform subsampling using epidemiological data from any geographical level (per country, per states, etc) provided daily case counts are available_
+
+* Read daily case data file
+* Convert date format to YYYY-MM-DD
+* Generate matrix of case counts, locations versus days
+
+## Creating genome matrix
+
+* Read genomic metadata file
+* Convert date format to YYYY-MM-DD
+* Generate matrix of genome counts, locations versus days
+
+
+## Aggregating genomic and epidemiological data per epiweek
+
+* Combine genomic and case counts per epidemiological week
+* Drop data from time periods outside the boundaries defined by `start_date` and `end_date`.
+
+## Correcting genomic sampling bias
+
+* Read matrices of epiweek genomic and case counts
+* Generate matrix reporting the observed sampling proportions per epiweek
+* Generate matrix reporting the sampling bias (under- and oversampling) given the baseline
+* Generate matrix with the corrected genome count per week, given the pre-defined baseline sampling proportion
+
+
+## Perform subsampling
+
+* Read sequence, metadata and corrected genomic count matrix
+* Read lists of genomes to be kept or remove in all instances (if provided)
+* Read batch removal file, to exclude genomes from certain metadata categories
+* Perform subsampling guided by case counts per epiweek
+* Generate subsampled sequence, and metadata file
+* Generate report with number of sampled genomes per location
+
+
+
 # Execution
 
 ```
@@ -110,48 +156,4 @@ matrix_cases_epiweeks.tsv
 matrix_genomes_epiweeks.tsv
 weekly_sampling_proportions.tsv
 ```
-
-
-# Pipeline overview
-
-![alt text](https://github.com/andersonbrito/subsampler/blob/master/images/workflow.png "subsampler")
-__Figure 1. Workflow Overview__ 
-
-
-## Creating case count matrix
-
-_`subsampler` can perform subsampling using epidemiological data from any geographical level (per country, per states, etc) provided daily case counts are available_
-
-* Read daily case data file
-* Convert date format to YYYY-MM-DD
-* Generate matrix of case counts, locations versus days
-
-## Creating genome matrix
-
-* Read genomic metadata file
-* Convert date format to YYYY-MM-DD
-* Generate matrix of genome counts, locations versus days
-
-
-## Aggregating genomic and epidemiological data per epiweek
-
-* Combine genomic and case counts per epidemiological week
-* Drop data from time periods outside the boundaries defined by `start_date` and `end_date`.
-
-## Correcting genomic sampling bias
-
-* Read matrices of epiweek genomic and case counts
-* Generate matrix reporting the observed sampling proportions per epiweek
-* Generate matrix reporting the sampling bias (under- and oversampling) given the baseline
-* Generate matrix with the corrected genome count per week, given the pre-defined baseline sampling proportion
-
-
-## Perform subsampling
-
-* Read sequence, metadata and corrected genomic count matrix
-* Read lists of genomes to be kept or remove in all instances (if provided)
-* Read batch removal file, to exclude genomes from certain metadata categories
-* Perform subsampling guided by case counts per epiweek
-* Generate subsampled sequence, and metadata file
-* Generate report with number of sampled genomes per location
 

@@ -35,7 +35,7 @@ conda activate subsampler
 snakemake subsample
 ```
 
-To run this pipeline, ones needs to provide a TSV file of daily case counts similar to the format below:
+To run this pipeline, users need to provide a TSV file of daily case counts similar to the format below:
 
 **US case counts**
 
@@ -69,7 +69,7 @@ To run this pipeline, ones needs to provide a TSV file of daily case counts simi
 |...|...           |...       |...       |...       |...       |...       |...|
 
 
-You can automatically download reformatted daily case count files from [CSSE at Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19) using one of the commands below:
+Using one of the commands below, users can download reformatted daily case count files automatically from [CSSE at Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19):
 
 **Global data**
 ```
@@ -81,19 +81,21 @@ python scripts/get_daily_matrix_global.py --download yes
 python scripts/get_daily_matrix_usa.py --download yes
 ```
 
-You can provide your own daily case count file, as long as it matches the format above (tab-separated with daily counts and a column with unique identifiers). If you downloaded such file using one of the commands above, place the reformatted TSV file inside `/data`.
+Users can provide their own daily case count file, as long as it matches the format above (tab-separated, with daily counts, and a column with unique identifiers). If one of the commands above is used, the reformatted matrix of case counts need to be placed inside `/data`.
 
 Now, edit the Snakefile to fix the followin lines:
 
-* [index_column](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L10) = code (this should match the index column with unique identifiers)
+* [index_column](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L10) = "code" (this should match the index column with unique identifiers)
 
 * [end_date](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L17) = "YYYY-MM-DD" (select an end date according to the case data file)
 
 * [extra_columns](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L32) = "second column with identifier" (one can select another column to be display alongside the `index_column`)
 
+
 ## Obtaining the percentage of sequenced cases per week
 
 The `subsampler` pipeline allows users to calculate the percentage of sequenced cases in countries and US states. It aggregates both genome counts and case counts per week per location (country or state), and proceed with the division genomes/cases to get a time series of proportion of sequenced genomes, information useful for monitoring how genomic surveillance is going in different regions.
+
 
 To that end, the user needs to provide a metadata matrix, similar to the one used by [nextstrain](nextstrain.org), which can be downloaded from [GISAID](gisaid.org), under `Downloads > Genomic Epidemiology`. Rename such file as `metadata_nextstrain.tsv`, place it inside `/data`, and the pipeline only half-way through, by using the command:
 
@@ -153,47 +155,3 @@ _`subsampler` can perform subsampling using epidemiological data from any geogra
 * Generate subsampled sequence, and metadata file
 * Generate report with number of sampled genomes per location
 
-
-
-<!-- 
-## Outputs:
-
-#### <OUTPUT_PREFIX>.fastq
-
-A merge of all files in the fastq directory specified as input.
-
-#### <OUTPUT_PREFIX>_periscope_counts.csv
-
-The counts of genomic, sub-genomic and normalisation values for known ORFs
-
-#### <OUTPUT_PREFIX>_periscope_amplicons.csv
-
-The amplicon by amplicon counts, this file is useful to see where the counts come from. Multiple amplicons may be represented more than once where they may have contributed to more than one ORF.
-
-#### <OUTPUT_PREFIX>_periscope_novel_counts.csv
-
-The counts of genomic, sub-genomic and normalisation values for non-canonical ORFs
-
-#### <OUTPUT_PREFIX>.bam
-
-minmap2 mapped reads and index with no adjustments made.
-
-#### <OUTPUT_PREFIX>_periscope.bam
-
-This is the original input bam file and index created by periscope with the reads specified in the fastq-dir. This file, however, has tags which represent the results of periscope:
-
-- XS is the alignment score
-- XA is the amplicon number
-- XC is the assigned class (gDNA or sgDNA)
-- XO is the orf assigned
-
-These are useful for manual review in IGV or similar genome viewer. You can sort or colour reads by these tags to aid in manual review and figure creation.
- -->
-
-
-<!-- 
-# Citations
-
-**Title**
-Authors. Journal; doi;
- -->

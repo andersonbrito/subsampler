@@ -137,7 +137,7 @@ Now, edit the Snakefile to fix the followin lines:
 The `subsampler` pipeline allows users to calculate the percentage of sequenced cases in countries and US states. It aggregates both genome counts and case counts per week per location (country or state), and proceed with the division genomes/cases to get a time series of proportion of sequenced genomes, information useful for monitoring how genomic surveillance is going in different regions.
 
 
-To that end, the user needs to provide a metadata matrix, similar to the one used by [nextstrain](nextstrain.org), which can be downloaded from [GISAID](gisaid.org), under `Downloads > Genomic Epidemiology`. Rename such file as `metadata_nextstrain.tsv`, place it inside `/data`, and the pipeline only half-way through, by using the command:
+To that end, the user needs to provide a metadata matrix, similar to the one used by [nextstrain](http://nextstrain.org), which can be downloaded from [GISAID](gisaid.org), under `Downloads > Genomic Epidemiology`. Rename such file as `metadata_nextstrain.tsv`, place it inside `/data`, and the pipeline only half-way through, by using the command:
 
 ```
 conda activate subsampler

@@ -157,8 +157,11 @@ if __name__ == '__main__':
     # check if available sequences have metadata
     meta_seqs = dfM['strain'].to_list()
     intersection = set(fasta_headers).intersection(meta_seqs)
+
+
     def Diff(li1, li2):
         return (list(list(set(li1) - set(li2)) + list(set(li2) - set(li1))))
+
 
     remove_sequences = remove_sequences + Diff(intersection, meta_seqs)
 
@@ -199,9 +202,10 @@ if __name__ == '__main__':
             if dfM.loc[idx, exposure_column].lower() in ['', 'unknown']:
                 dfM.loc[idx, exposure_column] = dfM.loc[idx, level]
 
-
     # get ISO alpha3 country codes
     codes = {'Rest of the US': 'RES', 'NewYork/NewJersey': 'NYJ'}
+
+
     def get_iso(country):
         global codes
         if country not in codes.keys():
@@ -287,7 +291,6 @@ if __name__ == '__main__':
         else:
             dfM['code'] = dfM[geo_level]
 
-
     # empty matrix dataframe
     columns = sorted(dfM['epiweek'].unique().tolist())
     rows = sorted(dfM[geo_level].astype(str).unique().tolist())
@@ -327,7 +330,7 @@ if __name__ == '__main__':
             dfF = dfF.append(chunk, ignore_index=True)
     else:
         dfF = dfM
-    
+
     print('\n### Removing genomes from categories listed in batch_removal.tsv...\n')
     # drop rows with unwanted samples
     drop_lines = open(drop_file).readlines()
@@ -397,17 +400,14 @@ if __name__ == '__main__':
     # print(report)
 
     # export fasta file
-    print('\n### Exporting sequences and metadata...\n')
+    print('\n### Exporting sequence list and metadata...\n')
     outfile1 = open(output1, 'w')
     c = 1
     found = []
-    for fasta in SeqIO.parse(open(input1), 'fasta'):
-        id, seq = fasta.description, fasta.seq
-        id = id.replace('hCoV-19/', '').split('|')[0].replace(' ', '')
-        if id in selected_samples and id not in found:
+    for id in selected_samples:
+        if id not in found:
             print(str(c) + '. ' + id)
-            entry = ">" + id + "\n" + str(seq.upper()) + "\n"
-            outfile1.write(entry)
+            outfile1.write(id)
             found.append(id)
             c += 1
 
@@ -433,3 +433,4 @@ if __name__ == '__main__':
         outfile3.write(sample + '\n')
 
     print('\nTotal sampled genomes: ' + str(total_genomes) + '\n')
+

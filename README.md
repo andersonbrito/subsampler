@@ -72,7 +72,6 @@ _`subsampler` can perform subsampling using epidemiological data from any geogra
 * Generate subsampled sequence, and metadata file
 * Generate report with number of sampled genomes per location
 
-
 # Execution
 
 To run this pipeline, users need to provide a TSV file of daily case counts similar to the format below:
@@ -161,3 +160,10 @@ To run the full pipeline, and obtain the list of genomes sampled based on COVID-
 snakemake subsample
 ```
 
+
+---
+**NOTE**
+
+For this pipeline to run as expected, producing a list of subsampled genomes, make sure that the 'sequence headers' in the fasta file match the 'strain names' in the metadata file. 
+
+---

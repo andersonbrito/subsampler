@@ -2,7 +2,7 @@
 
 # subsampler
 
-A tool to subsample genomic data guided by epidemiological time series data.
+A tool for subsampling genomic data based on epidemiological time series data.
 
 # Citing
 

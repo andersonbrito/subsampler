@@ -7,8 +7,7 @@ A tool for subsampling genomic data based on epidemiological time series data.
 # Citing
 
 If you use this tool in a publication, please cite our paper:
-
-> Alpert T, Brito AF, Lasek-Nesselquist E, Rothman J, Valesano AL, MacKay MJ, Petrone ME, Breban MI, Watkins AE, Vogels CB, Kalinich CC. [Early introductions and transmission of SARS-CoV-2 variant B.1.1.7 in the United States](https://www.sciencedirect.com/science/article/pii/S0092867421004347). Cell. 2021 May 13;184(10):2595-604.
+> Alpert, T., Brito, A. F., Lasek-Nesselquist, E., Rothman, J., Valesano, A. L., MacKay, M. J., ... & Grubaugh, N. D. (2021). [Early introductions and transmission of SARS-CoV-2 variant B.1.1.7 in the United States](https://www.sciencedirect.com/science/article/pii/S0092867421004347). Cell, 184(10), 2595-2604.
 
 
 # Requirements

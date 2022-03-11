@@ -15,7 +15,7 @@ rule arguments:
 		seed_num = "2007",
 		start_date = "2019-12-15",
 		end_date = "2021-04-22",
-		unit = "month"
+		unit = "week"
 
 
 arguments = rules.arguments.params

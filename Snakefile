@@ -14,7 +14,8 @@ rule arguments:
 		max_missing = "30",
 		seed_num = "2007",
 		start_date = "2019-12-15",
-		end_date = "2021-04-22"
+		end_date = "2021-04-22",
+		unit = "month"
 
 
 arguments = rules.arguments.params
@@ -56,15 +57,20 @@ rule epiweek_conversion:
 		output1 = "outputs/matrix_genomes_epiweeks.tsv",
 		output2 = "outputs/matrix_cases_epiweeks.tsv"
 	params:
-		start_date = "2020-02-22"
+		start_date = "2020-02-22",
+		format = "integer"
 	shell:
 		"""
-		python3 scripts/convertDays2Epiweek.py \
+		python3 scripts/aggregator.py \
 			--input {input.genome_matrix} \
+			--unit {arguments.unit} \
+			--format {params.format} \
 			--output {output.output1}
 
-		python3 scripts/convertDays2Epiweek.py \
+		python3 scripts/aggregator.py \
 			--input {input.case_matrix} \
+			--unit {arguments.unit} \
+			--format {params.format} \
 			--start-date {params.start_date} \
 			--output {output.output2}
 		"""

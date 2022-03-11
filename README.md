@@ -2,13 +2,13 @@
 
 # subsampler
 
-A tool to subsample genomic data guided by epidemiological time series data.
+A tool for subsampling genomic data based on epidemiological time series data.
 
 # Citing
 
 If you use this tool in a publication, please cite our paper:
+> Alpert, T., Brito, A. F., Lasek-Nesselquist, E., Rothman, J., Valesano, A. L., MacKay, M. J., ... & Grubaugh, N. D. (2021). [Early introductions and transmission of SARS-CoV-2 variant B.1.1.7 in the United States](https://www.sciencedirect.com/science/article/pii/S0092867421004347). Cell, 184(10), 2595-2604.
 
-[Early introductions and transmission of SARS-CoV-2 variant B.1.1.7 in the United States](https://www.sciencedirect.com/science/article/pii/S0092867421004347)
 
 # Requirements
 `subsampler` runs on MacOS and Linux.
@@ -71,7 +71,6 @@ _`subsampler` can perform subsampling using epidemiological data from any geogra
 * Perform subsampling guided by case counts per epiweek
 * Generate subsampled sequence, and metadata file
 * Generate report with number of sampled genomes per location
-
 
 # Execution
 
@@ -161,3 +160,10 @@ To run the full pipeline, and obtain the list of genomes sampled based on COVID-
 snakemake subsample
 ```
 
+
+---
+**NOTE**
+
+For this pipeline to run as expected, producing a list of subsampled genomes, make sure that the 'sequence headers' in the fasta file match the 'strain names' in the metadata file. 
+
+---

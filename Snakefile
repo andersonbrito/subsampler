@@ -2,12 +2,12 @@ rule arguments:
 	params:
 		sequences = "data/gisaid_hcov-19.fasta",
 		metadata = "data/metadata_nextstrain.tsv",
-		case_data = "data/time_series_covid19_usa_reformatted.tsv",
+		case_data = "data/time_series_covid19_global_reformatted.tsv",
 		keep_file = "config/keep.txt",
 		remove_file = "config/remove.txt",
 		include_file = "config/strict_inclusion.tsv",
 		drop_file = "config/batch_removal.tsv",
-		index_column = "division_exposure",
+		index_column = "country_exposure",
 		date_column = "date",
 		baseline = "0.0001",
 		refgenome_size = "29930",
@@ -30,7 +30,7 @@ rule genome_matrix:
 		metadata = arguments.metadata
 	params:
 		index = arguments.index_column,
-		extra_columns = "country_exposure",
+		extra_columns = "region_exposure country_exposure",
 		date = arguments.date_column
 	output:
 		matrix = "outputs/genome_matrix_days.tsv"

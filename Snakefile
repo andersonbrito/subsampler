@@ -9,7 +9,7 @@ rule arguments:
 		drop_file = "config/batch_removal.tsv",
 		index_column = "country_exposure",
 		date_column = "date",
-		baseline = "0.0001",
+		baseline = "0.001",
 		refgenome_size = "29930",
 		max_missing = "30",
 		seed_num = "2007",
@@ -54,8 +54,8 @@ rule epiweek_conversion:
 		genome_matrix = "outputs/genome_matrix_days.tsv",
 		case_matrix = arguments.case_data
 	output:
-		output1 = "outputs/matrix_genomes_epiweeks.tsv",
-		output2 = "outputs/matrix_cases_epiweeks.tsv"
+		output1 = "outputs/matrix_genomes_unit.tsv",
+		output2 = "outputs/matrix_cases_unit.tsv"
 	params:
 		start_date = "2020-02-22",
 		format = "integer"
@@ -82,15 +82,15 @@ rule correct_bias:
 		Correct under- and oversampling genome counts based on epidemiological data
 		"""
 	input:
-		genome_matrix = "outputs/matrix_genomes_epiweeks.tsv",
-		case_matrix = "outputs/matrix_cases_epiweeks.tsv"
+		genome_matrix = "outputs/matrix_genomes_unit.tsv",
+		case_matrix = "outputs/matrix_cases_unit.tsv"
 	params:
 		index = 'code',
 		baseline = arguments.baseline
 	output:
 		output1 = "outputs/weekly_sampling_proportions.tsv",
 		output2 = "outputs/weekly_sampling_bias.tsv",
-		output3 = "outputs/matrix_genomes_epiweeks_corrected.tsv"
+		output3 = "outputs/matrix_genomes_unit_corrected.tsv"
 	shell:
 		"""
 		python3 scripts/correct_bias.py \
@@ -111,7 +111,7 @@ rule subsample:
 	input:
 		sequences = arguments.sequences,
 		metadata = arguments.metadata,
-		corrected_matrix = "outputs/matrix_genomes_epiweeks_corrected.tsv",
+		corrected_matrix = "outputs/matrix_genomes_unit_corrected.tsv",
 		keep = arguments.keep_file,
 		remove = arguments.remove_file,
 		include = arguments.include_file,

@@ -13,8 +13,8 @@ rule arguments:
 		refgenome_size = "29930",
 		max_missing = "30",
 		seed_num = "2007",
-		start_date = "2019-12-15",
-		end_date = "2021-04-22",
+		start_date = "2020-03-01",
+		end_date = "2021-12-31",
 		unit = "week"
 
 
@@ -45,7 +45,7 @@ rule genome_matrix:
 		"""
 
 
-rule epiweek_conversion:
+rule unit_conversion:
 	message:
 		"""
 		Generate matrix of genome and case counts per epiweek
@@ -58,7 +58,7 @@ rule epiweek_conversion:
 		output2 = "outputs/matrix_cases_unit.tsv"
 	params:
 		start_date = "2020-02-22",
-		format = "integer"
+		format = "integer",
 	shell:
 		"""
 		python3 scripts/aggregator.py \

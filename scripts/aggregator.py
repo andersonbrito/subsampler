@@ -18,7 +18,7 @@ if __name__ == '__main__':
     parser.add_argument("--format",required=False, nargs=1, type=str, default='float',
                         choices=['float', 'integer'], help="What is the format of the data points (float/integer)?")
     parser.add_argument("--weekasdate",required=False, nargs=1, type=str, default='no',
-                        choices=['start', 'end'], help="If representing weeks as date, which day of the week should be used?")
+                        choices=['start', 'end', 'no'], help="If representing weeks as date, which day of the week should be used?")
     parser.add_argument("--start-date", required=False, type=str,  help="Start date in YYYY-MM-DD format")
     parser.add_argument("--end-date", required=False, type=str,  help="End date in YYYY-MM-DD format")
     parser.add_argument("--output", required=True, help="TSV matrix with aggregated counts")
@@ -96,7 +96,7 @@ if __name__ == '__main__':
             if unit == 'week':
                 epiweek = str(Week.fromdate(date, system="cdc")) # get epiweeks
                 year, week = epiweek[:4], epiweek[-2:]
-                if weekasdate not in ['', None]:
+                if weekasdate in ['start', 'end']:
                     if weekasdate == 'start':
                         epiweek = str(Week(int(year), int(week)).startdate())
                     else:

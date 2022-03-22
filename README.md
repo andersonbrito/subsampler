@@ -24,7 +24,7 @@ If you use this tool in a publication, please cite our paper:
 ```
 git clone https://github.com/andersonbrito/subsampler.git
 cd config
-conda env create -f subsampler.yml
+conda env create -f subsampler.yaml
 conda activate subsampler
 ```
 

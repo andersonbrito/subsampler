@@ -164,6 +164,6 @@ snakemake subsample
 ---
 ## NOTE
 
-For this pipeline to run as expected, generating a list of subsampled genomes, make sure that the 'sequence headers' in the fasta file match the 'strain names' in the metadata file. The metadata file itself must contain a minimum set of columns, such as `strain` and `date` (in uppercase letters). 
+For this pipeline to run as expected, and generate a list of subsampled genomes, make sure that the 'sequence headers' in the fasta file match the 'strain names' in the metadata file. Also, the metadata file itself must contain a minimum set of columns, such as `strain` and `date` (in uppercase letters). 
 
 ---

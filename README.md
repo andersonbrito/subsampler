@@ -11,11 +11,11 @@ If you use this tool in a publication, please cite our paper:
 
 
 # Requirements
-`subsampler` runs on MacOS and Linux. To run all its steps until the actually subsampling, besides having `conda` and the `subsampler` environment installed (see next section), you need to provide the following files:
+`subsampler` runs on MacOS and Linux. To run all of its steps until the actual subsampling, besides having `conda` and the `subsampler` environment installed (see next section), you need to provide the following files:
 
 * Metadata file containing at least sample names ("`strain`"), `date`, and geographic locations (`country`, `division`, etc).
-* A file in fasta format, listing all genomes included in the metadata above.
-* Matrix of daily case counts per geographic location (matching the geographic level of interested, present in the metadata)
+* File in fasta format listing all genomes included in the metadata above.
+* Matrix of daily case counts per geographic location (matching the geographic level of interested, included in the metadata)
 
 
 ---

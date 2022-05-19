@@ -11,14 +11,26 @@ If you use this tool in a publication, please cite our paper:
 
 
 # Requirements
-`subsampler` runs on MacOS and Linux.
+`subsampler` runs on MacOS and Linux. To run all its steps until the actually subsampling, besides having `conda` and the `subsampler` environment installed (see next section), you need to provide the following files:
 
-
-* conda
-* Fasta file containing all sampled genomes
 * Metadata file containing at least sample names ("`strain`"), `date`, and geographic locations (`country`, `division`, etc).
-* Matrix of daily case counts per geographic location (as listed in the metadata)
+* A file in fasta format, listing all genomes included in the metadata above.
+* Matrix of daily case counts per geographic location (matching the geographic level of interested, present in the metadata)
 
+
+---
+## Note
+
+1. If you only need to run this pipeline to calculate the proportion of sequenced cases per geographic location, per unit of time, you just need to run the pipeline up to the `correct_bias` step (snakemake correct_bias). It will produce a matrix with the proportions of sequenced cases, and will not need the fasta file, used only in the last step (snakemake subsample).
+
+2. For this pipeline to run as expected, up to its last step, to generate a list of subsampled genomes, make sure that the 'sequence headers' in the fasta file match the 'strain names' in the metadata file. Also, the metadata file itself must contain the minimum set of columns, such as `strain` and `date` (in lowercase letters).
+
+3. If the fasta file mentioned above is to large to be provided as input to the pipeline, the user can provide a mock fasta file. This file must list all genomes included in the metadata, and each sequence line can be simply represented by some mock sequence. For example, the sequence headers would 
+be something like `CountryName/SampleID_12345/202X`, and each sequence line could be simply shown as `ATCG`. By chance the parameter ['refgenome_size'](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L13) to `4`, and ['max_missing'](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L14) to `1`, the pipeline will run till the last step, and will provide you a subsampled metadata file in `outputs`. That file will contain a column with a list of accession numbers (`gisaid_epi_isl`, for example), and such list can be used to download a real sequence file from your genomic database of choice.
+
+
+
+---
 
 # Installation
 ```
@@ -161,9 +173,3 @@ snakemake subsample
 ```
 
 
----
-## NOTE
-
-For this pipeline to run as expected, and generate a list of subsampled genomes, make sure that the 'sequence headers' in the fasta file match the 'strain names' in the metadata file. Also, the metadata file itself must contain a minimum set of columns, such as `strain` and `date` (in uppercase letters). 
-
----

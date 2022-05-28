@@ -130,7 +130,7 @@ python scripts/get_daily_matrix_usa.py --download yes
 
 Users can provide their own daily case count file, as long as it matches the format above (tab-separated, with daily counts, and a column with unique identifiers). If one of the commands above is used, the reformatted matrix of case counts need to be placed inside `/data`.
 
-Now, edit the Snakefile to fix the followin lines:
+Now, edit the Snakefile to fix the following lines:
 
 * [index_column](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L10) = "code" (this should match the index column with unique identifiers)
 

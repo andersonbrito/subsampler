@@ -126,7 +126,7 @@ rule subsample:
 		start = arguments.start_date,
 		end = arguments.end_date
 	output:
-		output1 = "outputs/sequences.fasta",
+		output1 = "outputs/sequences.txt",
 		output2 = "outputs/metadata.tsv",
 		output3 = "outputs/sampling_stats.txt"
 	shell:

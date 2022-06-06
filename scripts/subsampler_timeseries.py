@@ -407,7 +407,7 @@ if __name__ == '__main__':
     for id in selected_samples:
         if id not in found:
             print(str(c) + '. ' + id)
-            outfile1.write(id)
+            outfile1.write(id + '\n')
             found.append(id)
             c += 1
 

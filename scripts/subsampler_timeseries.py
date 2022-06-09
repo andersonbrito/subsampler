@@ -53,7 +53,7 @@ if __name__ == '__main__':
     output2 = args.sampled_metadata
     output3 = args.report
 
-    # path = '/Users/anderson/GLab Dropbox/Anderson Brito/projects/ncov/ncov_nyc/nextstrain/run3_20210415_subsample/'
+    # path = ''
     # input1 = path + 'data/gisaid_hcov-19.fasta'
     # input2 = path + 'data/metadata_nextstrain.tsv'
     # input3 = path + 'outputs/matrix_genomes_epiweeks_corrected.tsv'
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     fasta_headers = []
     for fasta in SeqIO.parse(open(input1), 'fasta'):
         id, seq = fasta.description, str(fasta.seq)
-        id = id.replace('hCoV-19/', '').split('|')[0].replace(' ', '')
+        id = id.split('|')[0].replace(' ', '')
         size = len(seq.replace('N', '').replace('-', ''))
         min_size = genome_size - int(genome_size * max_gaps / 100)
         if size > min_size:

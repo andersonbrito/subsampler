@@ -36,6 +36,12 @@ conda env create -f subsampler.yaml
 conda activate subsampler
 ```
 
+To update the conda environment, run:
+
+```
+cd config
+conda env update -f subsampler.yaml
+```
 
 # Pipeline overview
 
@@ -170,10 +176,11 @@ snakemake subsample
 
 ### Downloading genome sequences
 
-Given that GISAID has now more than 11 million genomes, providing a fasta file with all entries is no longer practical. Currently, the easiest way to get a FASTA file containing the genomes subsampled in this pipeline is to do as follows:
+Given that GISAID has now more than 11 million genomes, providing a fasta file with all entries is no longer practical. Currently, the easiest way to get a FASTA file containing the genomes subsampled in this pipeline is to do as follows (see image):
 
-1. Get a list of accession numbers of the genomes that were subsampled. This is currently available as a column of `output/metadata.tsv`, provided your original metadata file contains such column.
-2. Go to [gisaid.org](https://www.gisaid.org/), and in the 'Search' page, click on 'Select', paste the list of accession numbers; click on 'OK', and choose the format 'Sequences (FASTA)'.
+1. Get a list of accession numbers of the genomes that were subsampled. This is currently available as a column of `output/metadata.tsv` (provided your original metadata file contains such column).
+2. Go to [gisaid.org](https://www.gisaid.org/); and visit the 'Search' page.
+3. Click on 'Select'; paste the list of accession numbers; click on 'OK'; and choose the format 'Sequences (FASTA)'.
 
-![alt text](https://github.com/andersonbrito/subsampler/config/blob/master/gisaid_download.png?raw=true)
+![alt text](https://github.com/andersonbrito/subsampler/blob/master/images/gisaid_download.png?raw=true)
 

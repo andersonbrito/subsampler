@@ -39,7 +39,8 @@ conda activate subsampler
 To update the conda environment, run:
 
 ```
-conda env update --file subsampler.yaml
+cd config
+conda env update -f subsampler.yaml
 ```
 
 # Pipeline overview

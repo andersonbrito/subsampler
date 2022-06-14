@@ -197,4 +197,5 @@ One of the outputs of this pipeline is `selected_sequences.txt`. If `id_column` 
 
 2022-06-12:
 * Fasta file with the actual sequences are no longer required as input file. Now, by default, the pipeline will not inspect the level of completeness of the genomes, but will focus on subsampling based on metadata rows only. However, asessement of sequence quality is still supported.
-* 
+* A `filter_file` is now an input of this pipeline (see 'config/filters.tsv', and this [line](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L8). With this file, users can determine specific data categories to be included or excluded. This feature is useful, for example, for subsampling 'variant-specific' data (e.g. include → pango_lineage → B.1.1.7), among other uses.
+* Uses can now specify the time unit of the time series (week, month or year), which should be set according to the most adequate time period that match the evolutionary time scale of the viruses under study (for SARS-CoV-2, 'week' is an adequate option, but for Dengue virus, 'month' is the best option).

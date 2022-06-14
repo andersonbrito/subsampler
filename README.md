@@ -20,11 +20,13 @@ If you use this tool in a publication, please cite our paper:
 ---
 ## Note
 
-1. If you only need to run this pipeline to calculate the proportion of sequenced cases per geographic location, per unit of time, you just need to run the pipeline up to the `correct_bias` step (`snakemake correct_bias`). It will produce a matrix with the proportions of sequenced cases, and the fasta file will not be required, as it is only used at the last step (`snakemake subsample`).
+1. If you only need to run this pipeline to calculate the proportion of sequenced cases per geographic location, per unit of time, you just need to run the pipeline up to the `correct_bias` step (`snakemake correct_bias`). It will produce a matrix with the proportions of sequenced cases.
 
-2. For this pipeline to run up to its last step, and generate a list of subsampled genomes, make sure that the 'sequence headers' in the fasta file match the 'strain' names in the metadata file. Also, the metadata file itself must contain the minimum set of columns, such as `strain` and `date` (in lowercase letters).
+2. For this pipeline to run up to its last step (`snakemake subsample`), the metadata file itself must contain the minimum set of columns (described above), correctly named in the Snakefile ([here](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L9)
 
-3. If the fasta file mentioned above is too large to be provided as input to `subsampler`, the user can provide a mock fasta file. This file must list all genomes included in the metadata, and each sequence line can be simply represented by some mock sequence. For example, the sequence headers have `strain` names in the standard format as in the metadata file (for example, `CountryName/SampleID_12345/202X`), and the sequence lines could be simply shown as `ATCG`. Now, if you set the parameter ['refgenome_size'](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L13) to `4`, and ['max_missing'](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L14) to `1`, the pipeline will run till the last step, providing a subsampled metadata file inside `outputs`. That file will contain a column with a list of accession numbers (`gisaid_epi_isl`, for example), and such list can be used to download the real sequence file from a genomic database (GISAID, for example), so that further analyses can be performed.
+3. The complete run of `subsampler` generates, among other files, a TXT file containing a list of accession numbers (`gisaid_epi_isl`, for example) or genome names (`strain`, for example), provided the corresponding columns are found in the metadata file used as input. Such list of genome names or (specially) accession numbers can be used to download an actual sequence file from a genomic database (GISAID, for example), so that further analyses can be performed.
+
+
 ---
 
 # Installation
@@ -42,6 +44,8 @@ cd config
 conda env update -f subsampler.yaml
 ```
 
+Alternatively, `mamba` can also be used to install the `subsampler` conda environment.
+
 # Pipeline overview
 
 ![alt text](https://github.com/andersonbrito/subsampler/blob/master/images/workflow.png "subsampler")
@@ -50,60 +54,47 @@ __Figure 1. Workflow Overview__
 
 ## Creating case count matrix
 
-_`subsampler` can perform subsampling using epidemiological data from any geographical level (per country, per states, etc) provided daily case counts are available_
+_`subsampler` can perform subsampling using epidemiological data from any geographical level (per country, per states, etc) provided daily case counts are available_. See more details in the 'Execution' section. To prepare
 
-* Read daily case data file
-* Convert date format to YYYY-MM-DD
-* Generate matrix of case counts, locations versus days
+* Download and provide a daily case data file
+* Generate matrix of case counts, per location (Y axis), per day (X axis)
 
 ## Creating genome matrix
 
+The pipeline will perform these actions:
 * Read genomic metadata file
 * Convert date format to YYYY-MM-DD
-* Generate matrix of genome counts, locations versus days
+* Generate matrix of genome counts, per location (Y axis), per day (X axis)
 
 
 ## Aggregating genomic and epidemiological data per epiweek
 
-* Combine genomic and case counts per epidemiological week
+The pipeline will perform these actions:
+* Combine genomic and case counts per unit of time (week, month, or year)
 * Drop data from time periods outside the boundaries defined by `start_date` and `end_date`.
 
 ## Correcting genomic sampling bias
 
-* Read matrices of epiweek genomic and case counts
-* Generate matrix reporting the observed sampling proportions per epiweek
-* Generate matrix reporting the sampling bias (under- and oversampling) given the baseline
-* Generate matrix with the corrected genome count per week, given the pre-defined baseline sampling proportion
+The pipeline will perform these actions:
+* Read matrices with case and genome counts
+* Generate matrix reporting the observed sampling proportions per unit of time
+* Generate matrix reporting the sampling bias (under- and oversampling) given the baseline defined by the user
+* Generate matrix with the corrected genome count per unit of time, given the pre-defined baseline sampling proportion
 
 
 ## Perform subsampling
 
-* Read sequence, metadata and corrected genomic count matrix
+The pipeline will perform these actions:
+* Read metadata and corrected genomic count matrix
 * Read lists of genomes to be kept or remove in all instances (if provided)
-* Read batch removal file, to exclude genomes from certain metadata categories
-* Perform subsampling guided by case counts per epiweek
-* Generate subsampled sequence, and metadata file
-* Generate report with number of sampled genomes per location
+* Read the filter file, to include or exclude genomes from certain metadata categories
+* Perform subsampling guided by case counts per unit of time
+* Generate a list subsampled sequences, and a corresponding metadata file
+* Generate a report with number of sampled genomes per location
 
 # Execution
 
 To run this pipeline, users need to provide a TSV file of daily case counts similar to the format below:
-
-**US case counts**
-
-|code|state         |2021-01-01|2021-01-02|2021-01-03|2021-01-04|2021-01-05|...|
-|----|--------------|----------|----------|----------|----------|----------|---|
-|AK  |Alaska        |5         |802       |297       |264       |200       |...|
-|AL  |Alabama       |4521      |3711      |2476      |2161      |5498      |...|
-|AR  |Arkansas      |4304      |2000      |2033      |1306      |4107      |...|
-|AS  |American Samoa|0         |0         |0         |0         |0         |...|
-|AZ  |Arizona       |10060     |8883      |17234     |5158      |5932      |...|
-|CA  |California    |39425     |50222     |37016     |38256     |38962     |...|
-|CO  |Colorado      |3064      |2011      |2078      |2185      |3458      |...|
-|CT  |Connecticut   |0         |4412      |0         |4516      |2332      |...|
-|DC  |District of Columbia|269       |257       |255       |140       |262       |...|
-|... |...           |...       |...       |...       |...       |...       |...|
-
 
 **Global case counts**
 
@@ -121,6 +112,23 @@ To run this pipeline, users need to provide a TSV file of daily case counts simi
 |...|...           |...       |...       |...       |...       |...       |...|
 
 
+**Country-level case counts**
+
+|code|state         |2021-01-01|2021-01-02|2021-01-03|2021-01-04|2021-01-05|...|
+|----|--------------|----------|----------|----------|----------|----------|---|
+|AK  |Alaska        |5         |802       |297       |264       |200       |...|
+|AL  |Alabama       |4521      |3711      |2476      |2161      |5498      |...|
+|AR  |Arkansas      |4304      |2000      |2033      |1306      |4107      |...|
+|AS  |American Samoa|0         |0         |0         |0         |0         |...|
+|AZ  |Arizona       |10060     |8883      |17234     |5158      |5932      |...|
+|CA  |California    |39425     |50222     |37016     |38256     |38962     |...|
+|CO  |Colorado      |3064      |2011      |2078      |2185      |3458      |...|
+|CT  |Connecticut   |0         |4412      |0         |4516      |2332      |...|
+|DC  |District of Columbia|269       |257       |255       |140       |262       |...|
+|... |...           |...       |...       |...       |...       |...       |...|
+
+
+
 Using one of the commands below, users can download reformatted daily case count files automatically from [CSSE at Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19):
 
 **Global data**
@@ -133,40 +141,39 @@ python scripts/get_daily_matrix_global.py --download yes
 python scripts/get_daily_matrix_usa.py --download yes
 ```
 
-Users can provide their own daily case count file, as long as it matches the format above (tab-separated, with daily counts, and a column with unique identifiers). If one of the commands above is used, the reformatted matrix of case counts need to be placed inside `/data`.
+Users can provide their own daily case count file, as long as it matches the format above (tab-separated, with daily counts, and a column with unique identifiers). If one of the commands above is used, the reformatted matrix of case counts would need to be placed inside `/data`, and should be named [here](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L5).
 
 Now, edit the Snakefile to fix the following lines:
 
-* [index_column](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L10) = "code" (this should match the index column with unique identifiers)
+* [start_date](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L16) = "YYYY-MM-DD" (select the start date according to your needs)
 
-* [end_date](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L17) = "YYYY-MM-DD" (select an end date according to the case data file)
+* [end_date](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L17) = "YYYY-MM-DD" (select the end date according to your needs)
 
-* [extra_columns](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L32) = "second column with identifier" (one can select another column to be display alongside the `index_column`)
+* [extra_columns](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L32) = second column with identifier, such as region, continent (a column found in the original metadata file, which you want to see displayed alongside the `geo_column` in the final outputs)
 
 
 ## Obtaining the percentage of sequenced cases per week
 
-The `subsampler` pipeline allows users to calculate the percentage of sequenced cases in countries and US states. It aggregates both genome counts and case counts per week per location (country or state), and proceed with the division genomes/cases to get a time series of proportion of sequenced genomes, information useful for monitoring how genomic surveillance is going in different regions.
+The `subsampler` pipeline allows users to calculate the percentage of sequenced cases per location. It aggregates both genome counts and case counts per unit of time, per location (country or state), and proceed with calculations (genomes/cases) to get a time series of proportions of sequenced cases, information useful for monitoring how genomic surveillance is going in different locations.
 
 
-To that end, the user needs to provide a metadata matrix, similar to the one used by [nextstrain](http://nextstrain.org), which can be downloaded from [GISAID](http://gisaid.org), under `Downloads > Genomic Epidemiology`. Rename such file as `metadata_nextstrain.tsv`, place it inside `/data`, and run the pipeline only half-way through, by using the command:
+To that end, the user needs to provide a metadata matrix, similar to the one used by [nextstrain](http://nextstrain.org), which can be downloaded from [GISAID](http://gisaid.org), under `Downloads > Genomic Epidemiology`. Add the name of that file [here](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L4), place it inside `/data`, and run the pipeline up to the `correct_bias` step using the command below:
 
 ```
-conda activate subsampler
 snakemake correct_bias
 ```
 
 After a few minutes, among the files in `/outputs`, users will find three matrices, one of them showing the weekly proportion of sequenced cases:
 
 ```
-matrix_cases_epiweeks.tsv
-matrix_genomes_epiweeks.tsv
+matrix_cases_unit.tsv
+matrix_genomes_unit.tsv
 weekly_sampling_proportions.tsv
 ```
 
 ## Obtaining a list of genomes, sampled based on time series of COVID-19 cases
 
-To run the full pipeline, and obtain the list of genomes sampled based on COVID-19 case counts, the last step of the pipeline need to be executed:
+To obtain a list of genomes sampled based on case counts, the last step of the pipeline need to be executed:
 
 
 ```
@@ -175,11 +182,10 @@ snakemake subsample
 
 ### Downloading genome sequences
 
-Given that GISAID has now more than 11 million genomes, providing a fasta file with all entries is no longer practical. Currently, the easiest way to get a FASTA file containing the genomes subsampled in this pipeline is to do as follows (see image):
+One of the outputs of this pipeline is `selected_sequences.txt`. If `id_column` is set [here](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L9) as `gisaid_epi_isl`, a list of accession numbers of subsampled genomes will be generated. Using that list, proceed as follows:
 
-1. Get a list of accession numbers of the genomes that were subsampled. This is currently available as a column of `output/metadata.tsv` (provided your original metadata file contains such column).
-2. Go to [gisaid.org](https://www.gisaid.org/); and visit the 'Search' page.
-3. Click on 'Select'; paste the list of accession numbers; click on 'OK'; and choose the format 'Sequences (FASTA)'.
+1. Go to [gisaid.org](https://www.gisaid.org/); and visit the 'Search' page of 'EpiCov'.
+2. Click on 'Select'; paste the list of accession numbers in the search box; click on 'OK'; and choose the format 'Sequences (FASTA)'.
 
 ![alt text](https://github.com/andersonbrito/subsampler/blob/master/images/gisaid_download.png?raw=true)
 
@@ -190,5 +196,5 @@ Given that GISAID has now more than 11 million genomes, providing a fasta file w
 ## Latest major updates
 
 2022-06-12:
-* Fasta file with the actual sequences are no longer a requirement as input file. Now, by default, the pipeline will not inspect the level of completeness of the genomes, but will focus on subsampling based on metadata rows only. However, asessement of sequence quality is still supported.
+* Fasta file with the actual sequences are no longer required as input file. Now, by default, the pipeline will not inspect the level of completeness of the genomes, but will focus on subsampling based on metadata rows only. However, asessement of sequence quality is still supported.
 * 

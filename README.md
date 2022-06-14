@@ -2,7 +2,7 @@
 
 # subsampler
 
-A tool for subsampling genomic data based on epidemiological time series data.
+A pipeline for subsampling genomic data based on epidemiological time series data.
 
 # Citing
 

@@ -184,3 +184,11 @@ Given that GISAID has now more than 11 million genomes, providing a fasta file w
 
 ![alt text](https://github.com/andersonbrito/subsampler/blob/master/images/gisaid_download.png?raw=true)
 
+
+
+
+
+## Latest major updates
+
+2022-06-12:
+* Text here

@@ -4,8 +4,8 @@ import argparse
 import time
 
 import platform
-print('Python version:', platform.python_version())
-print('Pandas version:', pd.__version__)
+# print('Python version:', platform.python_version())
+# print('Pandas version:', pd.__version__)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -14,7 +14,7 @@ if __name__ == '__main__':
     )
     parser.add_argument("--input", required=True, help="Matrix of daily counts per location")
     parser.add_argument("--unit", required=True, nargs=1, type=str, default='week',
-                        choices=['week', 'month', 'year'], help="Time unit for conversion")
+                        choices=['week', 'month', 'year', 'full'], help="Time unit for conversion")
     parser.add_argument("--format",required=False, nargs=1, type=str, default='float',
                         choices=['float', 'integer'], help="What is the format of the data points (float/integer)?")
     parser.add_argument("--weekasdate",required=False, nargs=1, type=str, default='no',

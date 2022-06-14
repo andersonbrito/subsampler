@@ -1,17 +1,17 @@
 rule arguments:
 	params:
-		sequences = "data/gisaid_hcov-19.fasta",
-		metadata = "data/metadata_nextstrain.tsv",
+#		sequences = "",
+		metadata = "data/metadata.tsv",
 		case_data = "data/time_series_covid19_global_reformatted.tsv",
 		keep_file = "config/keep.txt",
 		remove_file = "config/remove.txt",
-		include_file = "config/strict_inclusion.tsv",
-		drop_file = "config/batch_removal.tsv",
-		index_column = "country_exposure",
+		filter_file = "config/filters.tsv",
+		id_column = "gisaid_epi_isl",
+		geo_column = "country_exposure",
 		date_column = "date",
 		baseline = "0.001",
-		refgenome_size = "29930",
-		max_missing = "30",
+		refgenome_size = "1",
+		max_missing = "99",
 		seed_num = "2007",
 		start_date = "2020-03-01",
 		end_date = "2021-12-31",
@@ -24,13 +24,13 @@ arguments = rules.arguments.params
 rule genome_matrix:
 	message:
 		"""
-		Generate matrix of genome counts per day, for each element in column="{arguments.index_column}"
+		Generate matrix of genome counts per day, for each element in column="{arguments.geo_column}"
 		"""
 	input:
 		metadata = arguments.metadata
 	params:
-		index = arguments.index_column,
-		extra_columns = "region_exposure country_exposure",
+		index = arguments.geo_column,
+		extra_columns = "region_exposure",
 		date = arguments.date_column
 	output:
 		matrix = "outputs/genome_matrix_days.tsv"
@@ -59,6 +59,7 @@ rule unit_conversion:
 	params:
 		start_date = "2020-02-22",
 		format = "integer",
+		time_unit = arguments.unit
 	shell:
 		"""
 		python3 scripts/aggregator.py \
@@ -109,42 +110,43 @@ rule subsample:
 		Sample genomes and metadata according to the corrected genome matrix
 		"""
 	input:
-		sequences = arguments.sequences,
+#		sequences = arguments.sequences,
 		metadata = arguments.metadata,
 		corrected_matrix = "outputs/matrix_genomes_unit_corrected.tsv",
 		keep = arguments.keep_file,
 		remove = arguments.remove_file,
-		include = arguments.include_file,
-		drop = arguments.drop_file
+		filter_file = arguments.filter_file,
 	params:
 		size = arguments.refgenome_size,
 		missing = arguments.max_missing,
 		seed = arguments.seed_num,
-		index = arguments.index_column,
+		id_column = arguments.id_column,
+		geo_column = arguments.geo_column,
 		date = arguments.date_column,
-		filter = arguments.date_column, # change it if another date column needs to be used
 		start = arguments.start_date,
-		end = arguments.end_date
+		end = arguments.end_date,
+		time_unit = arguments.unit,
+		weekasdate = 'no'
 	output:
-		output1 = "outputs/sequences.txt",
-		output2 = "outputs/metadata.tsv",
+		output1 = "outputs/selected_sequences.txt",
+		output2 = "outputs/selected_metadata.tsv",
 		output3 = "outputs/sampling_stats.txt"
 	shell:
 		"""
 		python3 scripts/subsampler_timeseries.py \
-			--sequences {input.sequences} \
 			--metadata {input.metadata} \
 			--genome-matrix {input.corrected_matrix} \
 			--max-missing {params.missing} \
 			--refgenome-size {params.size} \
 			--keep {input.keep} \
 			--remove {input.remove} \
-			--drop_list {input.drop} \
-			--include_list {input.include} \
+			--filter-file {input.filter_file} \
 			--seed {params.seed} \
-			--index-column {params.index} \
+			--index-column {params.id_column} \
+			--geo-column {params.geo_column} \
 			--date-column {params.date} \
-			--filter-column {params.filter} \
+			--time-unit {params.time_unit} \
+			--weekasdate {params.weekasdate} \
 			--start-date {params.start} \
 			--end-date {params.end} \
 			--sampled-sequences {output.output1} \

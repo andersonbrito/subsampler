@@ -1,0 +1,4 @@
+action	column	value
+include	region	North America
+exclude	division	Tennessee
+exclude	division	Texas

@@ -11,10 +11,9 @@ If you use this tool in a publication, please cite our paper:
 
 
 # Requirements
-`subsampler` runs on MacOS and Linux. To run all of its steps until the actual subsampling, besides having `conda` and the `subsampler` environment installed (see next section), you need to provide the following files:
+`subsampler` runs on MacOS and Linux. To run all steps until the actual subsampling, besides having `conda` and the `subsampler` environment installed (see next section), you need to provide the following files:
 
-* Metadata file containing at least sample names ("`strain`"), `date`, and geographic locations (`country`, `division`, etc).
-* File in fasta format listing all genomes included in the metadata above.
+* Metadata file containing columns with at least: sample names (`strain`, or `accession number`), `date`, and geographic columns (`country`, `division`, etc).
 * Matrix of daily case counts per geographic location (matching the geographic level of interested, included in the metadata)
 
 
@@ -191,4 +190,5 @@ Given that GISAID has now more than 11 million genomes, providing a fasta file w
 ## Latest major updates
 
 2022-06-12:
-* Text here
+* Fasta file with the actual sequences are no longer a requirement as input file. Now, by default, the pipeline will not inspect the level of completeness of the genomes, but will focus on subsampling based on metadata rows only. However, asessement of sequence quality is still supported.
+* 

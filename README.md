@@ -197,12 +197,15 @@ If your questions are not directly related to phylogeography, the `subsampler` a
 
 If you are not trying to infer ancestral states in a phylogeographic perspective, but is more interested in phylodynamic questions, subsampling based on the timing of the events (waves, introductions, seasons, etc) is a better approach.
 
-In this repository you can find `genome_selector.py`, a python script designed to sample genomes following specific variables (date of colection, country, viral lineage, or any metadata column). For example, the table below illustrates a sampling scheme to obtain around 650 genomes of viruses belonging to lineage `B.1.1.7` (alpha variant), circulating in the US and the UK, between 2020-12-01 and 2021-06-30, with other US and European samples as contextual genomes. In this hypotheical example, note that contextual genomes are selected from two time periods, and in different proportions: 50 genomes up to late November 2020, and 100 genomes from December 2020 onwards (from any lineage). Also, the scheme is set up to ignore genomes from California and Scotland: genomes from those locations will not be included in any instance, since they are filtered out prior to the genome selection step. To reproduce the scheme below, `genome_selector.py` will use a `--metadata` file listing all genomes from the locations and lineages represented below.
+In this repository you can find `genome_selector.py`, a [python script](https://github.com/andersonbrito/subsampler/blob/master/scripts/genome_selector.py) designed to sample genomes following specific variables (date of colection, country, viral lineage, or any metadata column). For example, the table below illustrates a sampling scheme to obtain around 650 genomes of viruses belonging to lineage `B.1.1.7` (alpha variant), circulating in the US and the UK, between 2020-12-01 and 2021-06-30, with other US and European samples as contextual genomes. In this hypothetical example, note that contextual genomes are selected from two time periods, and in different proportions: 50 genomes up to late November 2020, and 100 genomes from December 2020 onwards (from any lineage).
 
-`genome_selector.py` is not part of `subsampler`, and should be executed separately, as illustrated below:
+Also, the scheme is set up to ignore genomes from California and Scotland: genomes from those locations will not be included in any instance, since they are filtered out prior to the genome selection step. To reproduce the scheme below, `genome_selector.py` will use a `--metadata` file listing all genomes from the locations and lineages represented below.
 
-> genome_selector.py [-h] --metadata METADATA [--keep KEEP] [--remove REMOVE] --scheme SCHEME [--report REPORT]
+`genome_selector.py` is not part of `subsampler`, and should be executed separately:
 
+```
+genome_selector.py [-h] --metadata METADATA [--keep KEEP] [--remove REMOVE] --scheme SCHEME [--report REPORT]
+```
 ... where `--scheme` is a TSV file with this format:
 
 |purpose|filter       |value     |filter2|value2    |sample_size|start     |end       |

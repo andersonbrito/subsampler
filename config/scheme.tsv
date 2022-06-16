@@ -1,0 +1,8 @@
+purpose	filter	value	filter2	value2	sample_size	start	end
+focus	pango_lineage	B.1.1.7	country	USA	200	2020-12-01	2021-06-30
+focus	pango_lineage	B.1.1.7	country	United Kingdom	200	2020-12-01	2021-06-30
+context	region	Europe			100	2020-12-01	2021-06-30
+context	country	USA			50		2020-11-30
+context	country	USA			100	2020-12-01	
+ignore	division	California					
+ignore	division	Scotland					

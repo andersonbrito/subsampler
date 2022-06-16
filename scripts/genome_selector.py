@@ -20,6 +20,8 @@ if __name__ == '__main__':
     parser.add_argument("--metadata", required=True, help="TSV metadata file")
     parser.add_argument("--keep", required=False, help="List of samples to keep, in all instances")
     parser.add_argument("--remove", required=False, help="List of samples to remove, in all instances")
+    parser.add_argument("--genome-column", required=True, type=str, default='strain', help="Column showing genome names (e.g. USA/CT-CDC-LC0062417/2021")
+    parser.add_argument("--accno-column", required=True, type=str, default='gisaid_epi_isl', help="Column showing genome accession numbers (e.g. EPI_ISL_2399048")
     parser.add_argument("--scheme", required=True, help="Subsampling scheme")
     parser.add_argument("--report", required=False, help="Report listing samples per category")
     args = parser.parse_args()
@@ -31,14 +33,15 @@ if __name__ == '__main__':
     report = args.report
 
 
-
-    # path = '/Users/anderson/GLab Dropbox/Anderson Brito/projects/ncov/ncov_pango/nextstrain/run3_20210721_B1526newaugur/'
+    # path = ''
     # import os
     # os.chdir(path)
-    # metadata = path + 'pre-analyses/metadata_nextstrain.tsv'
-    # keep = 'config/keep_short.txt'
+    # metadata = path + ''
+    # keep = None
     # remove = None
-    # scheme = path + 'config/subsampling_scheme_time.tsv'
+    # genome_col = 'strain'
+    # accno_col = 'gisaid_epi_isl'
+    # scheme = ''
     # report = path + 'report.tsv'
 
 
@@ -50,10 +53,27 @@ if __name__ == '__main__':
     else:
         to_keep = [strain.strip() for strain in open(keep, 'r').readlines() if strain[0] not in ['#', '\n']]
 
+
+    def load_table(file):
+        df = ''
+        if str(file).split('.')[-1] == 'tsv':
+            separator = '\t'
+            df = pd.read_csv(file, encoding='utf-8', sep=separator, dtype='str')
+        elif str(file).split('.')[-1] == 'csv':
+            separator = ','
+            df = pd.read_csv(file, encoding='utf-8', sep=separator, dtype='str')
+        elif str(file).split('.')[-1] in ['xls', 'xlsx']:
+            df = pd.read_excel(file, index_col=None, header=0, sheet_name=0, dtype='str')
+            df.fillna('', inplace=True)
+        else:
+            print('Wrong file format. Compatible file formats: TSV, CSV, XLS, XLSX')
+            exit()
+        return df
+
     # subsampling scheme
-    dfS = pd.read_csv(scheme, encoding='utf-8', sep='\t', dtype=str)
-    dfS['sample_size'] = dfS['sample_size'].astype(int)
-    results = {'strain': {}, 'gisaid_epi_isl': {}}
+    dfS = load_table(scheme)
+    dfS['sample_size'] = dfS['sample_size'].fillna(0).astype(int)
+    results = {genome_col: {}, accno_col: {}}
 
     ### IGNORING SAMPLES
     # list of rows to be ignored
@@ -68,16 +88,16 @@ if __name__ == '__main__':
 
     print('\n* Loading metadata...')
     # nextstrain metadata
-    dfN = pd.read_csv(metadata, encoding='utf-8', sep='\t', dtype=str)
+    dfN = load_table(metadata)
     dfN.fillna('', inplace=True) # replace empty values by blank
-    dfN['strain'] = dfN['strain'].str.replace('hCoV-19/', '', regex=False)
+    dfN[genome_col] = dfN[genome_col].str.replace('hCoV-19/', '', regex=False)
 
 
-    # print(dfN['strain'].tolist())
+    # print(dfN[genome_col].tolist())
     name_accno = {}
     for genome in to_keep:
-        if genome in dfN['strain'].tolist():
-            accno = dfN.loc[dfN['strain'] == genome, 'gisaid_epi_isl'].values[0]
+        if genome in dfN[genome_col].tolist():
+            accno = dfN.loc[dfN[genome_col] == genome, accno_col].values[0]
             name_accno[genome] = accno
 
     # drop lines if samples are set to be ignored
@@ -90,10 +110,10 @@ if __name__ == '__main__':
         to_remove = []
     else:
         to_remove = [strain.strip() for strain in open(remove, 'r').readlines()]
-    dfN = dfN[~dfN['strain'].isin(to_remove)]
+    dfN = dfN[~dfN[genome_col].isin(to_remove)]
 
     # prevent samples already selected in keep.txt from being resampled
-    dfN = dfN[~dfN['strain'].isin(to_keep)]
+    dfN = dfN[~dfN[genome_col].isin(to_keep)]
 
     print('\n* Dropping sequences with incomplete date...')
     # drop rows with incomplete dates
@@ -118,7 +138,7 @@ if __name__ == '__main__':
     for category in purposes:
         query = {} # create a dict for each 'purpose'
         for idx, value1 in dfS.loc[dfS['purpose'] == category, 'value'].to_dict().items():
-            print('\n > Filter #' + str(idx))
+            print('\n > Filter #' + str(idx + 1))
 
             filter1 = dfS.iloc[idx]['filter']
             print('    Filtering by ' + filter1 + ': ' + value1)
@@ -152,7 +172,7 @@ if __name__ == '__main__':
             # drop any row with dates outside the start/end dates
             mask = (dfFilter['date'] >= min_date) & (dfFilter['date'] <= max_date)
             dfFilter = dfFilter.loc[mask]  # apply mask
-            # print(dfFilter[['strain', 'date']])
+            # print(dfFilter[[genome_col, 'date']])
 
             gEpiweek = dfFilter.groupby('epiweek')
             sample_size = dfS.iloc[idx]['sample_size']
@@ -171,11 +191,11 @@ if __name__ == '__main__':
                 for id in results.keys():
                     selected = random_subset[id].to_list()
                     results[id][filter1][value1] = results[id][filter1][value1] + selected
-                    if id == 'gisaid_epi_isl':
+                    if id == accno_col:
                         drop_now = drop_now + selected
 
             # drop pre-selected samples to prevent duplicates
-            dfN = dfN[~dfN['gisaid_epi_isl'].isin(drop_now)]
+            dfN = dfN[~dfN[accno_col].isin(drop_now)]
 
     ### EXPORT RESULTS
     print('\n\n# Genomes sampled per category in subsampling scheme\n')
@@ -209,7 +229,7 @@ if __name__ == '__main__':
 
                     for genome in entries:
                         if genome not in [exported + to_keep]:
-                            if id == 'strain':
+                            if id == genome_col:
                                 outfile_names.write(genome + '\n')
                             else:
                                 outfile_accno.write(genome + '\n')
@@ -233,7 +253,7 @@ if __name__ == '__main__':
 
 
         warning = 0
-        for level, name in results['strain'].items():
+        for level, name in results[genome_col].items():
             for place, entries in name.items():
                 if len(entries) == 0:
                     if warning < 1:

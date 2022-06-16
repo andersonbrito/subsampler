@@ -20,8 +20,8 @@ if __name__ == '__main__':
     parser.add_argument("--metadata", required=True, help="TSV metadata file")
     parser.add_argument("--keep", required=False, help="List of samples to keep, in all instances")
     parser.add_argument("--remove", required=False, help="List of samples to remove, in all instances")
-    parser.add_argument("--genome-column", required=True, type=str, default='strain', help="Column showing genome names (e.g. USA/CT-CDC-LC0062417/2021")
-    parser.add_argument("--accno-column", required=True, type=str, default='gisaid_epi_isl', help="Column showing genome accession numbers (e.g. EPI_ISL_2399048")
+    parser.add_argument("--genome-column", required=False, type=str, default='strain', help="Column showing genome names (e.g. USA/CT-CDC-LC0062417/2021")
+    parser.add_argument("--accno-column", required=False, type=str, default='gisaid_epi_isl', help="Column showing genome accession numbers (e.g. EPI_ISL_2399048")
     parser.add_argument("--scheme", required=True, help="Subsampling scheme")
     parser.add_argument("--report", required=False, help="Report listing samples per category")
     args = parser.parse_args()
@@ -29,6 +29,8 @@ if __name__ == '__main__':
     metadata = args.metadata
     keep = args.keep
     remove = args.remove
+    genome_col = args.genome_column
+    accno_col = args.accno_column
     scheme = args.scheme
     report = args.report
 

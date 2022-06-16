@@ -212,7 +212,7 @@ Also, the scheme is set up to ignore genomes from California and Scotland: genom
 `genome_selector.py` is **not** part of `subsampler`. It should be executed separately:
 
 ```
-genome_selector.py --metadata METADATA
+python genome_selector.py --metadata METADATA
 ```
 ... where `--scheme` is a TSV file with this format:
 

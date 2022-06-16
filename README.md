@@ -209,10 +209,10 @@ In this repository you can find `genome_selector.py`, a [python script](https://
 
 Also, the scheme is set up to ignore genomes from California and Scotland: genomes from those locations will not be included in any instance, since they are filtered out prior to the genome selection step. To reproduce the scheme below, `genome_selector.py` will use a `--metadata` file listing all genomes from the locations and lineages represented below.
 
-`genome_selector.py` is *not* part of `subsampler`, and should be executed separately:
+`genome_selector.py` is **not** part of `subsampler`. It should be executed separately:
 
 ```
-genome_selector.py [-h] --metadata METADATA [--keep KEEP] [--remove REMOVE] --scheme SCHEME [--report REPORT]
+genome_selector.py --metadata METADATA
 ```
 ... where `--scheme` is a TSV file with this format:
 
@@ -227,6 +227,6 @@ genome_selector.py [-h] --metadata METADATA [--keep KEEP] [--remove REMOVE] --sc
 |ignore |division     |Scotland  |       |          |           |          |          |
 
 
-Among the outputs of `genome_selector.py` users will find text files containing a list of around 650 genome names (e.g. USA/CT-CDC-LC0062417/2021) and another with the corresponding accession numbers (e.g. EPI_ISL_2399048). The last one can be used to filter and download genomes directly from [gisaid.org](https://www.gisaid.org/), as explained [above](https://github.com/andersonbrito/subsampler#downloading-genome-sequences).
+Among the outputs of `genome_selector.py`, users will find text files containing the list of around 650 genomes, both as names (e.g. USA/CT-CDC-LC0062417/2021) and as accession numbers (e.g. EPI_ISL_2399048). The last file can be used to filter and download genomes directly from [gisaid.org](https://www.gisaid.org/), as explained [above](https://github.com/andersonbrito/subsampler#downloading-genome-sequences).
 
 

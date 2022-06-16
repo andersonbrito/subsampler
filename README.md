@@ -191,7 +191,7 @@ One of the outputs of this pipeline is `selected_sequences.txt`. If `id_column` 
 
 
 
-### Subsampler may not be what you need if...
+## Subsampler may not be what you need if...
 
 If your questions are not directly related to phylogeography, the `subsampler` approach (to obtain genomes sampled based on cases counts) may not be what you need. Since the sampling is weighted by cases counts, `subsampler` is more likely to sample genomes from heavily impacted countries (those with more reported cases), and the lower the [baseline](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L12) (the percentage of sequenced cases) being used, the less likely would it be for countries facing small scale outbreaks to be represented (for example, the least populated countries), which end up being overshadowed by larger countries, which may report hundreds of thousands of cases per week.
 

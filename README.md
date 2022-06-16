@@ -191,6 +191,14 @@ One of the outputs of this pipeline is `selected_sequences.txt`. If `id_column` 
 
 
 
+## Latest major updates
+
+2022-06-12:
+* Fasta file with the actual sequences are no longer required as input file. Now, by default, the pipeline will not inspect the level of completeness of the genomes, but will focus on subsampling based on metadata rows only. However, asessement of sequence quality is still supported.
+* A `filter_file` is now an input of this pipeline (see 'config/filters.tsv', and this [line](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L8). With this file, users can determine specific data categories to be included or excluded. This feature is useful, for example, for subsampling 'variant-specific' data (e.g. include → pango_lineage → B.1.1.7), among other uses.
+* Uses can now specify the time unit of the time series (week, month or year), which should be set according to the most adequate time period that match the evolutionary time scale of the viruses under study (for SARS-CoV-2, 'week' is an adequate option, but for Dengue virus, 'month' is the best option).
+
+
 ## Subsampler may not be what you need if...
 
 If your questions are not directly related to phylogeography, the `subsampler` approach (to obtain genomes sampled based on case counts) may not be what you need. Since the sampling is weighted by case counts, `subsampler` is more likely to sample genomes from heavily impacted countries (those with more reported cases), and the lower the [baseline](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L12) (the percentage of sequenced cases) being used, the less likely would it be for countries facing small scale outbreaks to be represented (for example, the least populated countries), which end up being overshadowed by larger countries, which may report hundreds of thousands of cases per week.
@@ -201,7 +209,7 @@ In this repository you can find `genome_selector.py`, a [python script](https://
 
 Also, the scheme is set up to ignore genomes from California and Scotland: genomes from those locations will not be included in any instance, since they are filtered out prior to the genome selection step. To reproduce the scheme below, `genome_selector.py` will use a `--metadata` file listing all genomes from the locations and lineages represented below.
 
-`genome_selector.py` is not part of `subsampler`, and should be executed separately:
+`genome_selector.py` is *not* part of `subsampler`, and should be executed separately:
 
 ```
 genome_selector.py [-h] --metadata METADATA [--keep KEEP] [--remove REMOVE] --scheme SCHEME [--report REPORT]
@@ -222,10 +230,3 @@ genome_selector.py [-h] --metadata METADATA [--keep KEEP] [--remove REMOVE] --sc
 Among the outputs of `genome_selector.py` users will find text files containing a list of around 650 genome names (e.g. USA/CT-CDC-LC0062417/2021) and another with the corresponding accession numbers (e.g. EPI_ISL_2399048). The last one can be used to filter and download genomes directly from [gisaid.org](https://www.gisaid.org/), as explained [above](https://github.com/andersonbrito/subsampler#downloading-genome-sequences).
 
 
-
-## Latest major updates
-
-2022-06-12:
-* Fasta file with the actual sequences are no longer required as input file. Now, by default, the pipeline will not inspect the level of completeness of the genomes, but will focus on subsampling based on metadata rows only. However, asessement of sequence quality is still supported.
-* A `filter_file` is now an input of this pipeline (see 'config/filters.tsv', and this [line](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L8). With this file, users can determine specific data categories to be included or excluded. This feature is useful, for example, for subsampling 'variant-specific' data (e.g. include → pango_lineage → B.1.1.7), among other uses.
-* Uses can now specify the time unit of the time series (week, month or year), which should be set according to the most adequate time period that match the evolutionary time scale of the viruses under study (for SARS-CoV-2, 'week' is an adequate option, but for Dengue virus, 'month' is the best option).

@@ -214,7 +214,7 @@ Also, the scheme is set up to ignore genomes from California and Scotland: genom
 ```
 python genome_selector.py --metadata METADATA
 ```
-... where `--scheme` is a TSV file with this format:
+... where `--scheme` is a [TSV file](https://github.com/andersonbrito/subsampler/blob/master/config/scheme.tsv) with this format:
 
 |purpose|filter       |value     |filter2|value2    |sample_size|start     |end       |
 |-------|-------------|----------|-------|----------|-----------|----------|----------|

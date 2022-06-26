@@ -1,4 +1,4 @@
 action	column	value
-include	region	North America
-exclude	division	Tennessee
-exclude	division	Texas
+include	region	Endor
+exclude	division	Mordor
+exclude	division	Lindon

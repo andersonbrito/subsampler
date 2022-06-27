@@ -200,7 +200,7 @@ Let's take a look at the USA (329,5 million inhabitants), earlier in the pandemi
 |Country      |Data type|2020_EW10                                                          |2020_EW11|2020_EW12|2020_EW13|2020_EW14|
 |-------------|---------|-------------------------------------------------------------------|---------|---------|---------|---------|
 |United States|Observed number of reported cases|378                                                                |2575     |23047    |101392   |192359   |
-|United States|Observed number of sequenced genomes|358                                                                |1695     |4135     |3162     |771      |
+|United States|Observed number of genomes|358                                                                |1695     |4135     |3162     |771      |
 |United States|Expected number of genomes under a scenario of 0.1% sequenced cases|0                                                                  |3        |24       |102      |193      |
 |United States|Expected number of genomes under a scenario of 1% sequenced cases|4                                                                  |26       |231      |1014     |1924     |
 |United States|Expected number of genomes under a scenario of 5% sequenced cases|19                                                                 |129      |1153     |5070     |9618     |
@@ -211,7 +211,7 @@ However, under the same parameters shown above, when we look at the scenarios in
 |Country      |Data type|2020_EW10                                                          |2020_EW11|2020_EW12|2020_EW13|2020_EW14|
 |-------------|---------|-------------------------------------------------------------------|---------|---------|---------|---------|
 |United Arab Emirates|Observed number of reported cases|24                                                                 |40       |68       |315      |1037     |
-|United Arab Emirates|Observed number of sequenced genomes|0                                                                  |8        |5        |5        |7        |
+|United Arab Emirates|Observed number of genomes|0                                                                  |8        |5        |5        |7        |
 |United Arab Emirates|Expected number of genomes, under a scenario of 0.1% sequenced cases|0                                                                  |0        |0        |0        |2        |
 |United Arab Emirates|Expected number of genomes, under a scenario of 1% sequenced cases|0                                                                  |0        |0        |4        |11       |
 |United Arab Emirates|Expected number of genomes, under a scenario of 5% sequenced cases|2                                                                  |2        |4        |16       |52       |

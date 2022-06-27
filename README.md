@@ -193,9 +193,9 @@ One of the outputs of this pipeline is `selected_sequences.txt`. If `id_column` 
 
 ## Outbreak scale and its impact on subsampling
 
-Given the observed number of reported cases in each unit of time (week, month, etc), `subsampler` attempts to normalized the distribution of genomes sampled over time, following a pre-defined proportion of sequenced cases, a baseline defined by the user ([here](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L12)). The scales of the outbreaks worldwide, however, are very distinct, what poses an extra challenge when it comes to subsampling in proportion to reported cases: while a country with 10 million inhabitants may report a few thousand cases per week, larger countries (with hundreds of million inhabitants) may report more than a million cases in a week.
+Given the observed number of reported cases in each unit of time (week, month, etc), `subsampler` attempts to normalized the distribution of genomes sampled over time, following a pre-defined proportion of sequenced cases, a baseline defined by the user ([here](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L12)). The scales of the outbreaks worldwide, however, differ by many orders of magnitude, what poses an extra challenge when it comes to subsampling in proportion to reported cases: while a country with 10 million inhabitants may report a few thousand cases per week, larger countries (with populations greater than 100 million) may report more than a million cases in a week. Such large scale may overwhelm the representation of smaller countries in the final dataset, especially if the baseline is not carefully adjusted.
 
-Let's take a look at the USA (329,5 million inhabitants), earlier in the pandemic. Below we have the observed numbers of reported cases and the number of sequenced cases. Under scenarios simulating distinct proportions of sequenced cases, hundreds of event thousands of genomes may be sampled.
+Let's take a look at an example involving the USA (329,5 million inhabitants). Below we have the observed numbers of reported cases and the number of sequenced cases earlier in the pandemic. Under scenarios simulating different proportions of sequenced cases, hundreds or even thousands of genomes may be sampled from each week.
 
 |Country      |Data type|2020_EW10                                                          |2020_EW11|2020_EW12|2020_EW13|2020_EW14|
 |-------------|---------|-------------------------------------------------------------------|---------|---------|---------|---------|
@@ -206,7 +206,7 @@ Let's take a look at the USA (329,5 million inhabitants), earlier in the pandemi
 |United States|Expected number of genomes under a scenario of 5% sequenced cases|19                                                                 |129      |1153     |5070     |9618     |
 
 
-However, under the same parameters shown above, when we look at the scenarios in a country with a smaller population, for example, United Arab Emirates (9.9 million inhabitants), the number of sampled genomes may be a few dozen, or no genomes at all, as the [baseline](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L12) may be too low to allow sampling of even a single genome. For example, 0.01% sequenced cases in a week with 7,000 reported cases would indicate the sampling of 0.7 genomes, which cannot be done, case where the expected number of genomes is set to zero. Below we have an example with the observed numbers of reported cases and the number of sequenced cases in the United Arab Emirates, and the resulting subsampling in distinct scenarios.
+However, under the same parameters shown above, when we look at scenarios in a country with a smaller population, for example, the United Arab Emirates (9.9 million inhabitants), the number of sampled genomes in a given week may be a few dozen, or none at all, as the [baseline](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L12) may be too low to allow sampling of even a single genome. For example, 0.01% sequenced cases in a week with 7,000 reported cases would suggest the sampling of 0.7 genomes, which cannot be performed. In this situation, the expected number of genomes is set to zero. Below we have an example showing the observed numbers of reported cases and the number of sequenced cases in the United Arab Emirates, and the resulting subsampling in different scenarios (see the expected number of genomes in rows where the baseline was set as 0.1 or 1% sequenced cases).
 
 |Country      |Data type|2020_EW10                                                          |2020_EW11|2020_EW12|2020_EW13|2020_EW14|
 |-------------|---------|-------------------------------------------------------------------|---------|---------|---------|---------|
@@ -217,7 +217,7 @@ However, under the same parameters shown above, when we look at the scenarios in
 |United Arab Emirates|Expected number of genomes, under a scenario of 5% sequenced cases|2                                                                  |2        |4        |16       |52       |
 
 
-In summary, given the differences in outbreak scales, depending on the research questions, the user must set up the baseline accordingly, to allow sampling from specific locations or time periods (for example, early phases of an epidemic, where smaller number of cases are reported).
+In summary, given the differences in outbreak scales, depending on the research questions, the user should set up the baseline accordingly, to allow sampling from specific locations or time periods (for example, early phases of an epidemic, where smaller number of cases are reported).
 
 
 ## Latest major updates

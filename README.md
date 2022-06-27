@@ -210,8 +210,8 @@ However, under the same parameters shown above, when we look at the scenarios in
 
 |Country      |Data type|2020_EW10                                                          |2020_EW11|2020_EW12|2020_EW13|2020_EW14|
 |-------------|---------|-------------------------------------------------------------------|---------|---------|---------|---------|
-|United Arab Emirates|Number of reported cases|24                                                                 |40       |68       |315      |1037     |
-|United Arab Emirates|Number of sequenced genomes|0                                                                  |8        |5        |5        |7        |
+|United Arab Emirates|Observed number of reported cases|24                                                                 |40       |68       |315      |1037     |
+|United Arab Emirates|Observed number of sequenced genomes|0                                                                  |8        |5        |5        |7        |
 |United Arab Emirates|Expected number of genomes, under a scenario of 0.1% sequenced cases|0                                                                  |0        |0        |0        |2        |
 |United Arab Emirates|Expected number of genomes, under a scenario of 1% sequenced cases|0                                                                  |0        |0        |4        |11       |
 |United Arab Emirates|Expected number of genomes, under a scenario of 5% sequenced cases|2                                                                  |2        |4        |16       |52       |

@@ -115,7 +115,9 @@ if __name__ == '__main__':
             elif int(case_count) > 0 and int(genome_count) == 0:
                 samp_prop = 0
                 bias = '-'
-                corrected_count = int(np.ceil(case_count * global_samp_prop))
+                corrected_count = 0
+                if case_count * global_samp_prop >= 0.9: # defines how to proceed when requested values is below 1 genome
+                    corrected_count = int(np.ceil(case_count * global_samp_prop))
             else:
                 samp_prop = 'X'
                 bias = 'X'

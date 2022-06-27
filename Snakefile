@@ -30,7 +30,7 @@ rule genome_matrix:
 		metadata = arguments.metadata
 	params:
 		index = arguments.geo_column,
-		extra_columns = "region_exposure",
+		extra_columns = "country_exposure",
 		date = arguments.date_column
 	output:
 		matrix = "outputs/genome_matrix_days.tsv"

@@ -191,7 +191,7 @@ One of the outputs of this pipeline is `selected_sequences.txt`. If `id_column` 
 
 
 
-## Outbreak scales and the subsampling
+## Outbreak scale and its impact on subsampling
 
 Given the observed number of reported cases in each unit of time (week, month, etc), `subsampler` attempts to normalized the distribution of genomes sampled over time, following a pre-defined proportion of sequenced cases, a baseline defined by the user ([here](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L12)). The scales of the outbreaks worldwide, however, are very distinct, what poses an extra challenge when it comes to subsampling in proportion to reported cases: while a country with 10 million inhabitants may report a few thousand cases per week, larger countries (with hundreds of million inhabitants) may report more than a million cases in a week.
 

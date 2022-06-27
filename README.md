@@ -191,6 +191,35 @@ One of the outputs of this pipeline is `selected_sequences.txt`. If `id_column` 
 
 
 
+## Outbreak scale and its impact on subsampling
+
+Given the observed number of reported cases in each unit of time (week, month, etc), `subsampler` attempts to normalized the distribution of genomes sampled over time, following a pre-defined proportion of sequenced cases, a baseline defined by the user ([here](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L12)). The scales of the outbreaks worldwide, however, differ by many orders of magnitude, what poses an extra challenge when it comes to subsampling in proportion to reported cases: while a country with 10 million inhabitants may report a few thousand cases per week, larger countries (with populations greater than 100 million) may report more than a million cases in a week. Such large scale may overwhelm the representation of smaller countries in the final dataset, especially if the baseline is not carefully adjusted.
+
+Let's take a look at an example involving the USA (329,5 million inhabitants). Below we have the observed numbers of reported cases and the number of sequenced cases earlier in the pandemic. Under scenarios simulating different proportions of sequenced cases, hundreds or even thousands of genomes may be sampled from each week.
+
+|Country      |Data type|2020_EW10                                                          |2020_EW11|2020_EW12|2020_EW13|2020_EW14|
+|-------------|---------|-------------------------------------------------------------------|---------|---------|---------|---------|
+|United States|Observed number of reported cases|378                                                                |2575     |23047    |101392   |192359   |
+|United States|Observed number of genomes|358                                                                |1695     |4135     |3162     |771      |
+|United States|Expected number of genomes under a scenario of 0.1% sequenced cases|0                                                                  |3        |24       |102      |193      |
+|United States|Expected number of genomes under a scenario of 1% sequenced cases|4                                                                  |26       |231      |1014     |1924     |
+|United States|Expected number of genomes under a scenario of 5% sequenced cases|19                                                                 |129      |1153     |5070     |9618     |
+
+
+However, under the same parameters shown above, when we look at scenarios in a country with a smaller population, for example, the United Arab Emirates (9.9 million inhabitants), the number of sampled genomes in a given week may be a few dozen, or none at all, as the [baseline](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L12) may be too low to allow sampling of even a single genome. For example, 0.01% sequenced cases in a week with 7,000 reported cases would suggest the sampling of 0.7 genomes, which cannot be performed. In this situation, the expected number of genomes is set to zero. Below we have an example showing the observed numbers of reported cases and the number of sequenced cases in the United Arab Emirates, and the resulting subsampling in different scenarios (see the expected number of genomes in rows where the baseline was set as 0.1 or 1% sequenced cases).
+
+|Country      |Data type|2020_EW10                                                          |2020_EW11|2020_EW12|2020_EW13|2020_EW14|
+|-------------|---------|-------------------------------------------------------------------|---------|---------|---------|---------|
+|United Arab Emirates|Observed number of reported cases|24                                                                 |40       |68       |315      |1037     |
+|United Arab Emirates|Observed number of genomes|0                                                                  |8        |5        |5        |7        |
+|United Arab Emirates|Expected number of genomes, under a scenario of 0.1% sequenced cases|0                                                                  |0        |0        |0        |2        |
+|United Arab Emirates|Expected number of genomes, under a scenario of 1% sequenced cases|0                                                                  |0        |0        |4        |11       |
+|United Arab Emirates|Expected number of genomes, under a scenario of 5% sequenced cases|2                                                                  |2        |4        |16       |52       |
+
+
+In summary, given the differences in outbreak scales, depending on the research questions, the user should set up the baseline accordingly, to allow sampling from specific locations or time periods (for example, early phases of an epidemic, where smaller number of cases are reported).
+
+
 ## Latest major updates
 
 2022-06-12:
@@ -201,7 +230,7 @@ One of the outputs of this pipeline is `selected_sequences.txt`. If `id_column` 
 
 ## Subsampler may not be what you need if...
 
-If your questions are not directly related to phylogeography, the `subsampler` approach (to obtain genomes sampled based on case counts) may not be what you need. Since the sampling is weighted by case counts, `subsampler` is more likely to sample genomes from heavily impacted countries (those with more reported cases), and the lower the [baseline](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L12) (the percentage of sequenced cases), the less likely would it be for countries facing small scale outbreaks to be represented (for example, the least populated countries), which end up being overshadowed by larger countries, which may report hundreds of thousands of cases per week.
+If your questions are not directly related to phylogeography, the `subsampler` approach (to obtain subsets of genomes sampled based on case counts) may not be what you need. Since the sampling is weighted by case counts, `subsampler` is more likely to sample genomes from heavily impacted countries (those with more reported cases), and the lower the [baseline](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L12) (the percentage of sequenced cases), the less likely would it be for countries facing small scale outbreaks to be represented (for example, the least populated countries), which end up being overshadowed by larger countries, which may report hundreds of thousands of cases per week.
 
 If you are not trying to infer ancestral states in a phylogeographic perspective, but is more interested in phylodynamic questions, subsampling based on the timing of the events (waves, introductions, seasons, etc) is a better approach.
 

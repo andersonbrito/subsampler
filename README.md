@@ -6,7 +6,7 @@ A pipeline for subsampling genomic data based on epidemiological time series dat
 
 # Citing
 
-If you use this tool in a publication, please cite this DOI:
+If you use this tool in a publication, please cite this DOI: 10.5281/zenodo.7065455
 
 [![DOI](https://zenodo.org/badge/295074846.svg)](https://zenodo.org/badge/latestdoi/295074846)
 

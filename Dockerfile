@@ -21,6 +21,7 @@ RUN /bin/bash -c "source /opt/subsampler/scripts/install-miniconda.sh"
 
 # install conda dependencies
 WORKDIR /opt/subsampler/config
+RUN /bin/bash -c "source conda init bash"
 RUN conda env create -f subsampler.yaml
 RUN conda activate subsampler
 

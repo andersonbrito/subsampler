@@ -6,6 +6,7 @@ COPY . /opt/subsampler
 
 # Set default locale to en_US.UTF-8
 ENV LANG="en_US.UTF-8" LANGUAGE="en_US:en" LC_ALL="en_US.UTF-8" MINICONDA_PATH="/opt/miniconda"
+ENV PATH="$MINICONDA_PATH/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 # apt packages
 RUN apt-get update
@@ -24,6 +25,5 @@ RUN conda env create -f subsampler.yaml
 RUN conda activate subsampler
 
 # set up entrypoint
-ENV PATH="$MINICONDA_PATH/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 CMD ["/bin/bash"]
 

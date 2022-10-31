@@ -17,7 +17,7 @@ RUN apt-get install -y -qq --no-install-recommends \
         liblz4-tool pigz bzip2 lbzip2 zip unzip zstd
 
 # install conda
-RUN /opt/subsampler/scripts/install-miniconda.sh
+RUN /bin/bash -c "source /opt/subsampler/scripts/install-miniconda.sh"
 
 # install conda dependencies
 WORKDIR /opt/subsampler/config

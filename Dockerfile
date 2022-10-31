@@ -13,8 +13,7 @@ RUN apt-get install -y -qq --no-install-recommends \
         lsb-release ca-certificates wget rsync curl python-is-python3 python3-pip \
         less nano vim git locales make \
         dirmngr parallel gnupg file \
-        liblz4-tool pigz bzip2 lbzip2 zip unzip zstd \
-        ttf-dejavu
+        liblz4-tool pigz bzip2 lbzip2 zip unzip zstd
 
 # install conda
 RUN /opt/subsampler/scripts/install-miniconda.sh

@@ -12,6 +12,7 @@ rm /tmp/Miniconda3-${MINICONDA_VERSION}-x86_64.sh
 
 PATH="$MINICONDA_PATH/bin:$PATH"
 hash -r
+conda init bash
 conda config --set always_yes yes --set changeps1 no
 conda config --add channels r
 conda config --add channels defaults

@@ -3,7 +3,7 @@ FROM continuumio/miniconda3
 LABEL maintainer "Daniel Park <dpark@broadinstitute.org>"
 
 # Set default locale to en_US.UTF-8
-ENV LANG="en_US.UTF-8" LANGUAGE="en_US:en" LC_ALL="en_US.UTF-8"
+ENV LANG="en_US.UTF-8" LANGUAGE="en_US:en" LC_ALL="C"
 
 # apt packages
 RUN apt-get update
@@ -21,7 +21,7 @@ WORKDIR /app
 RUN conda env create -f /opt/subsampler/config/subsampler.yaml
 
 # Make RUN commands use the new environment:
-RUN echo "conda activate myenv" >> ~/.bashrc
+RUN echo "conda activate subsampler" >> ~/.bashrc
 SHELL ["/bin/bash", "--login", "-c"]
 
 # set up entrypoint

@@ -28,7 +28,7 @@ Alternatively, you can cite the original manuscript:
 
 2. For this pipeline to run up to its last step (`snakemake subsample`), the metadata file itself must contain the minimum set of columns (described above), correctly named in the Snakefile ([here](https://github.com/andersonbrito/subsampler/blob/master/Snakefile#L9)).
 
-3. The complete run of `subsampler` generates, among other files, a TXT file containing a list of accession numbers (`gisaid_epi_isl`, for example) or genome names (`strain`, for example), provided the corresponding columns are found in the metadata file used as input. Such list of genome names or (specially) accession numbers can be used to download an actual sequence file from a genomic database (GISAID, for example), so that further analyses can be performed.
+3. The complete run of `subsampler` generates, among other files, a TXT file containing a list of accession numbers (`gisaid_epi_isl`, for example) or genome names (`strain`, for example), provided the corresponding columns are found in the metadata file used as input. Such list of genome names or (especially) accession numbers can be used to download an actual sequence file from a genomic database (GISAID, for example), so that further analyses can be performed.
 
 
 ---
